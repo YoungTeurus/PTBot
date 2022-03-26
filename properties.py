@@ -10,3 +10,8 @@ WAIT_SETTINGS: dict[str, float] = {
 
 PONY_TOWN_URL: str = "http://pony.town"
 PATH_TO_CHROME_DRIVER: str = "./extra/chromedriver.exe"
+
+MESSAGE_LEN_LIMITS: dict[str, int] = {
+    "global": 72,
+    "whisper": 128
+}

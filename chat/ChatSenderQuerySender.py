@@ -1,7 +1,8 @@
+from chat.ChatMessagePreprocessor import ChatMessagePreprocessor
 from chat.ChatSender import ChatSender
 
 
-class ChatSenderController:
+class ChatSenderQuerySender:
     chatSender: ChatSender
     sendQuery: list[str]
 
@@ -10,7 +11,7 @@ class ChatSenderController:
         self.sendQuery = []
 
     def addMessageToQuery(self, msg: str) -> None:
-        self.sendQuery.append(msg)
+        self.sendQuery.extend(ChatMessagePreprocessor.prepareMessageForGlobal(msg))
 
     def sendNextMessage(self) -> None:
         self.chatSender.sendMessage(self.sendQuery.pop(0))

@@ -2,11 +2,12 @@ from time import sleep
 
 from selenium.webdriver import Chrome
 
-from bot.BotActionSubscriber import BotActionProcessor, ChatSenderWorker
+from bot.BotWorkersContainer import BotWorkersContainer
+from bot.workers.ChatSenderWorker import ChatSenderWorker
 from chat.ChatReader import ChatReader
 from chat.ChatParser import ChatParser
 from chat.ChatSender import ChatSender
-from chat.ChatSenderController import ChatSenderController
+from chat.ChatSenderQuerySender import ChatSenderQuerySender
 from driver.DriverInitializer import DriverInitializer
 from driver.ElementManipulator import ElementManipulator
 from driver.LocalStorage import LocalStorage
@@ -19,18 +20,11 @@ if __name__ == "__main__":
     manipulator: ElementManipulator = ElementManipulator(driver)
     enterGame(manipulator)
 
-    chatBox = '//*[@id="chat-log"]/div/div[2]/div[2]/div'
-    chatLine = 'div'
-
     ch = ChatReader(manipulator, localStorage)
     cp = ChatParser()
     cs = ChatSender(manipulator)
 
-    csc = ChatSenderController(cs)
-    bap = BotActionProcessor()
+    csqs = ChatSenderQuerySender(cs)
+    bwc = BotWorkersContainer()
 
-    bap.addWorker(ChatSenderWorker(csc))
-
-    sleep(5)
-    for i in range(5):
-        csc.addMessageToQuery("msg {}".format(i))
+    bwc.addWorker(ChatSenderWorker(csqs))
