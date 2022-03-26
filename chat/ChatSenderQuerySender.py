@@ -3,15 +3,23 @@ from chat.ChatSender import ChatSender
 
 
 class ChatSenderQuerySender:
-    chatSender: ChatSender
-    sendQuery: list[str]
+    __chatSender: ChatSender
+    __sendQuery: list[str]
 
     def __init__(self, chatSender: ChatSender):
-        self.chatSender = chatSender
-        self.sendQuery = []
+        self.__chatSender = chatSender
+        self.__sendQuery = []
 
     def addMessageToQuery(self, msg: str) -> None:
-        self.sendQuery.extend(ChatMessagePreprocessor.prepareMessageForGlobal(msg))
+        self.__sendQuery.extend(ChatMessagePreprocessor.prepareMessageForGlobal(msg))
 
     def sendNextMessage(self) -> None:
-        self.chatSender.sendMessage(self.sendQuery.pop(0))
+        msgToSend = self.__sendQuery[0]
+        try:
+            self.__chatSender.sendMessage(msgToSend)
+            self.__sendQuery.remove(msgToSend)
+        except RuntimeError as err:
+            print(err)
+
+    def hasMsgs(self) -> bool:
+        return len(self.__sendQuery) > 0

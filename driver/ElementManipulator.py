@@ -1,6 +1,6 @@
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver import Chrome
+from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -26,9 +26,9 @@ DEFAULT_WAIT_SETTINGS = WaitSettings(
 
 
 class ElementManipulator:
-    driver: Chrome
+    driver: WebDriver
 
-    def __init__(self, driver: Chrome):
+    def __init__(self, driver: WebDriver):
         self.driver = driver
 
     def findAll(self, path: str, waitSettings: WaitSettings = DEFAULT_WAIT_SETTINGS) -> list[WebElement]:
@@ -127,5 +127,5 @@ class ElementManipulator:
                         waitSettings: WaitSettings = DEFAULT_WAIT_SETTINGS) -> None:
         self.findOneAndApply(path, CLICK_ELEMENT, orElse, waitSettings=waitSettings)
 
-    def getDriver(self) -> Chrome:
+    def getDriver(self) -> WebDriver:
         return self.driver

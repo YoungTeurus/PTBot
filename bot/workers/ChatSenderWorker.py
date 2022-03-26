@@ -3,12 +3,13 @@ from threading import Lock
 
 from bot.workers.BaseBotWorker import BaseBotWorker
 from chat.ChatSenderQuerySender import ChatSenderQuerySender
+from properties import CHAT_SENDER_WORKER
 
 
 class ChatSenderWorker(BaseBotWorker):
     chatSenderController: ChatSenderQuerySender
     lastMessageTime: float
-    secsBetweenMessages: float = 1
+    secsBetweenMessages: float = CHAT_SENDER_WORKER["secsBetweenMessages"]
 
     def __init__(self, chatSenderController: ChatSenderQuerySender):
         super(ChatSenderWorker, self).__init__()
@@ -19,10 +20,9 @@ class ChatSenderWorker(BaseBotWorker):
         super().prepare(lock)
 
     def hasWork(self) -> bool:
-        return len(self.chatSenderController.sendQuery) > 0 and\
+        return self.chatSenderController.hasMsgs() and \
                (time() - self.lastMessageTime) > self.secsBetweenMessages
 
     def doWork(self) -> None:
         self.chatSenderController.sendNextMessage()
         self.lastMessageTime = time()
-        print("Sent msg! Waiting for {} secs...".format(self.secsBetweenMessages))

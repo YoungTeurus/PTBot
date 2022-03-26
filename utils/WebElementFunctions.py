@@ -1,3 +1,4 @@
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.remote.webelement import WebElement
 
 from utils.Utils import ELEMENT_CALLBACK

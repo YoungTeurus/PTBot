@@ -1,6 +1,6 @@
 LOGIN_SETTINGS: dict[str, str] = {
-    "remember_me": "zWdsSqUSld%2F5Q6%2F%2BnhKhybWkCy4WrgzALXQ8qjhsrqNeGuA7Ocft1oMTXNcQ3y0PHcxW4kWj9PqwsiOvjBRykw%3D%3D%7CtM9OlYI7%2FwYmqcRHwdjTUZ1zpOof06lvZ7BTp%2FxEuY2OnvNgt9KxYyCtTqt9cgr0buHY3BAUmIFUX2lpUhRNlw%3D%3D",
-    "connect.sid": "s%3AUoTgE4PpWn8Z79lo5_15NdAF6DVPoq9N.RvdxYHuT1YfIwn4E2FJ0Z0uRehxucHwwasZt5p21Cj0"
+    "remember_me": "tGNOKsXL5ARlXpj0uSFsLnZv4OZtF%2B1fCEzmgQMcomLKGJ0FdsNqTkdxrP0uqiSO7gpnzEV4mZpzUAa0GLs7Ew%3D%3D%7Cw4sFlYE45N08M9XheP6ZSTMLwNDq2747T%2FLJPpAkbq8vh2MDc3D8xYDIELOltwJ6uPKs9FHspjJD2AEd%2FToViA%3D%3D",
+    "connect.sid": "s%3AWhJY5BlhdOZQ54I-0lVnOmGm8B3p65ob.dqicy9S63ZHT8f0dqM2KIYbiZhPkvtnr9zB4%2Bgk2X98"
 }
 
 WAIT_SETTINGS: dict[str, float] = {
@@ -10,8 +10,17 @@ WAIT_SETTINGS: dict[str, float] = {
 
 PONY_TOWN_URL: str = "http://pony.town"
 PATH_TO_CHROME_DRIVER: str = "./extra/chromedriver.exe"
+PATH_TO_FIREFOX_DRIVER: str = "./extra/geckodriver.exe"
 
 MESSAGE_LEN_LIMITS: dict[str, int] = {
     "global": 72,
     "whisper": 128
+}
+
+CHAT_SENDER_WORKER = {
+    "secsBetweenMessages": 1
+}
+
+CHAT_READER_WORKER = {
+    "secsBetweenChecks": 1
 }
