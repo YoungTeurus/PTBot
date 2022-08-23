@@ -14,6 +14,7 @@ from driver.LocalStorage import LocalStorage
 from modules.ConsoleHistoryWriter import ConsoleHistoryWriter
 from modules.Parrot import Parrot
 from modules.TestCommandModule import TestCommandModule
+from modules.TestCommandWithHistoryModule import TestCommandWithHistoryModule
 from workflow import logInPT, enterGame
 
 if __name__ == "__main__":
@@ -38,5 +39,5 @@ if __name__ == "__main__":
 
     bwc.addWorker(ChatReaderWorker(cr, cp, ch))
 
-    ch.addObserver(TestCommandModule(csqs))
+    ch.addObserver(TestCommandWithHistoryModule(csqs))
 

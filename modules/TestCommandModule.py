@@ -1,3 +1,4 @@
+from chat.ChatMessage import ChatMessage
 from chat.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.CommandDrivenModule import CommandDrivenModule, ACTION_CALLBACK, ChatCommand, ChatCommandArg
 
@@ -17,7 +18,7 @@ class TestCommandModule(CommandDrivenModule):
 
         self.addCommand(command)
 
-    def sayFirstArg(self, args: list[str]) -> None:
+    def sayFirstArg(self, msg: ChatMessage, args: list[str]) -> None:
         textToSay = args[0]
         print("Command 'test' with argument '{}'".format(textToSay))
         self.csqs.addMessageToQuery("Повторяю: '{}'".format(textToSay))

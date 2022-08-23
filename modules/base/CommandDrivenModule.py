@@ -6,7 +6,7 @@ from properties import COMMAND_PREFIX
 from utils.Utils import STRING_PREDICATE
 
 # (args) => None
-ACTION_CALLBACK = Callable[[list[str]], None]
+ACTION_CALLBACK = Callable[[ChatMessage, list[str]], None]
 # (command, msg.sender, args, reason) => None
 ACTION_ON_COMMAND_ERROR_HANDLER = Callable[[str, str, list[str], str], None]
 
@@ -15,7 +15,7 @@ class ChatCommandArg:
     name: str
     predicate: STRING_PREDICATE | None
 
-    def __init__(self, name: str, predicate: STRING_PREDICATE | None = None):
+    def __init__(self, name: str, predicate: STRING_PREDICATE = None):
         self.name = name
         self.predicate = predicate
 
@@ -27,7 +27,7 @@ class ChatCommand:
     optionalArgs: list[ChatCommandArg]
 
     def __init__(self, command: str, action: ACTION_CALLBACK,
-                 args: list[ChatCommandArg] | None = None, optionalArgs: list[ChatCommandArg] | None = None):
+                 args: list[ChatCommandArg] = None, optionalArgs: list[ChatCommandArg] = None):
         self.command = command
         self.action = action
         self.args = args if args is not None else []
@@ -39,10 +39,16 @@ class CommandDrivenModule(ChatObserver):
     commands: dict[str, ChatCommand]
     # (command, msg.sender, args, reason) => None
     actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER
+    actionOnNonCommandInput: Callable[[ChatMessage], None] | None
+    acceptNonCommandInputWithPrefix: bool
 
-    def __init__(self, actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None):
+    def __init__(self, actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
+                 actionOnNonCommandInput: Callable[[ChatMessage], None] = None,
+                 asseptNonCommandInputWithPrefix: bool = False):
         self.commands = {}
         self.actionOnCommandError = actionOnCommandError
+        self.actionOnNonCommandInput = actionOnNonCommandInput
+        self.acceptNonCommandInputWithPrefix = asseptNonCommandInputWithPrefix
 
     def addCommand(self, chatCommand: ChatCommand):
         self.commands[chatCommand.command] = chatCommand
@@ -54,6 +60,8 @@ class CommandDrivenModule(ChatObserver):
 
     def notify(self, msg: ChatMessage) -> NotifyAction:
         if not msg.body.startswith(COMMAND_PREFIX):
+            if self.actionOnNonCommandInput is not None:
+                self.actionOnNonCommandInput(msg)
             return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
         command, args = CommandDrivenModule.getCommandAndArgs(msg.body)
 
@@ -63,7 +71,10 @@ class CommandDrivenModule(ChatObserver):
                 self.onError(command, msg.sender, args, "Length of args is more than args len for command")
             elif len(args) < len(currentCommand.args):
                 self.onError(command, msg.sender, args, "Length of args is lesser than args len for command")
-            currentCommand.action(args)
+            else:
+                currentCommand.action(msg, args)
+        elif self.acceptNonCommandInputWithPrefix and self.actionOnNonCommandInput is not None:
+            self.actionOnNonCommandInput(msg)
         return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
 
     @staticmethod
