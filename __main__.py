@@ -1,3 +1,5 @@
+import sys
+
 from selenium.webdriver.firefox.webdriver import WebDriver
 
 from bot.BotWorkersContainer import BotWorkersContainer
@@ -15,17 +17,23 @@ from modules.ConsoleHistoryWriter import ConsoleHistoryWriter
 from modules.Parrot import Parrot
 from modules.TestCommandModule import TestCommandModule
 from modules.TestCommandWithHistoryModule import TestCommandWithHistoryModule
-from workflow import logInPT, enterGame
+from utils.BotProperites import BotProperties
+from workflow import logInPT, enterGame, getSkinName
 
 if __name__ == "__main__":
     driver: WebDriver = DriverInitializer.startFirefoxDriver()
     localStorage: LocalStorage = LocalStorage(driver)
+
+    bp = BotProperties()
+
     logInPT(driver)
     manipulator: ElementManipulator = ElementManipulator(driver)
+
+    bp.botName = getSkinName(manipulator)
     enterGame(manipulator)
 
     cr = ChatReader(manipulator, localStorage)
-    cp = ChatParser()
+    cp = ChatParser(bp)
     cs = ChatSender(manipulator)
 
     bwc = BotWorkersContainer()
@@ -35,9 +43,9 @@ if __name__ == "__main__":
 
     ch = ChatHistory()
     ch.addObserver(ConsoleHistoryWriter())
-    # ch.addObserver(Parrot(csqs))
+    ch.addObserver(Parrot(csqs))
 
     bwc.addWorker(ChatReaderWorker(cr, cp, ch))
 
-    ch.addObserver(TestCommandWithHistoryModule(csqs))
+    # ch.addObserver(TestCommandWithHistoryModule(csqs))
 

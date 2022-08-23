@@ -3,11 +3,16 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
 from chat.ChatMessage import ChatMessage, ChatMessageType, SYSTEM, BOT_NAME, EVERYONE
+from utils.BotProperites import BotProperties
 
 
 class ChatParser:
-    @staticmethod
-    def parseDiv(chatLineDiv: WebElement) -> ChatMessage:
+    botProperties: BotProperties
+
+    def __init__(self, botProperties: BotProperties):
+        self.botProperties = botProperties
+
+    def parseDiv(self, chatLineDiv: WebElement) -> ChatMessage:
         classes: list[str] = chatLineDiv.get_attribute("class").split(" ")
 
         type = ChatMessageType()
@@ -28,7 +33,6 @@ class ChatParser:
         body: str = chatLineDiv.find_element(By.XPATH, "./*[@class='chat-line-message']").text
 
         builder = ChatMessage.Builder()
-        builder.type = type
         builder.lead = lead
         builder.timestamp = datetime.datetime.strptime(timestamp, "%H:%M")
         builder.label = label
@@ -38,16 +42,19 @@ class ChatParser:
             hasPrefixTo: bool = msgTextWithoutBody[:msgTextWithoutBody.index('[')].find("To") >= 0
 
             if hasPrefixTo:
-                builder.sender = BOT_NAME
+                builder.sender = self.botProperties.botName
                 builder.receiver = name
             else:
                 builder.sender = name
-                builder.receiver = BOT_NAME
+                builder.receiver = self.botProperties.botName
         elif type.isAnnouncement or type.isSystem:
-            builder.receiver = BOT_NAME
+            builder.receiver = self.botProperties.botName
             builder.sender = name if len(name) > 0 else None
         else:
             builder.sender = name
+        if builder.sender == self.botProperties.botName:
+            type.sentByBot = True
+        builder.type = type
         builder.body = body
 
         return builder.build()
