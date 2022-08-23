@@ -31,8 +31,10 @@ class ChatReaderWorker(WorkLockingBaseBotWorker):
 
     def doWork(self) -> None:
         newChatDivs: list[WebElement] = self.chatReader.getAllNewChatDivs()
+        newMsgs: list[ChatMessage] = []
         for chatDiv in newChatDivs:
-            msg: ChatMessage = self.chatParser.parseDiv(chatDiv)
-            self.chatHistory.appendHistory(msg)
+            newMsg: ChatMessage = self.chatParser.parseDiv(chatDiv)
+            newMsgs.append(newMsg)
+        self.chatHistory.appendHistoryMultipleAndClean(newMsgs)
 
         self.lastCheckTime = time()
