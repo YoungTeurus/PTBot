@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import time
 
+UNKNOWN = "UNKNOWN"
 BOT_NAME = "BOT_NAME"
 SYSTEM = "SYSTEM"
 EVERYONE = "EVERYONE"
@@ -39,15 +40,22 @@ class ChatMessage:
 
     def __str__(self):
         flags = ""
+        sender = None
         if self.type.isSystem:
+            sender = SYSTEM
             flags += "s"
         if self.type.isWhisper:
             flags += "w"
         if self.type.isAnnouncement:
+            sender = SYSTEM
             flags += "a"
         if len(flags) < 1:
             flags += "n"
-        return "{} {} {} -> {}: {}".format(flags, self.timestamp.strftime("%H:%M"), self.sender, self.receiver, self.body)
+
+        sender = self.sender if sender is None else sender
+        receiver = EVERYONE if self.receiver is None else self.receiver
+
+        return "{} {} {} -> {}: {}".format(flags, self.timestamp.strftime("%H:%M"), sender, receiver, self.body)
 
     class Builder:
         type: ChatMessageType

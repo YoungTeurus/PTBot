@@ -1,18 +1,18 @@
 from time import time
 from threading import Lock
 
-from bot.workers.BaseBotWorker import BaseBotWorker
+from bot.workers.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 from chat.ChatSenderQuerySender import ChatSenderQuerySender
 from properties import CHAT_SENDER_WORKER
 
 
-class ChatSenderWorker(BaseBotWorker):
+class ChatSenderWorker(WorkLockingBaseBotWorker):
     chatSenderController: ChatSenderQuerySender
     lastMessageTime: float
     secsBetweenMessages: float = CHAT_SENDER_WORKER["secsBetweenMessages"]
 
     def __init__(self, chatSenderController: ChatSenderQuerySender):
-        super(ChatSenderWorker, self).__init__()
+        super().__init__()
         self.chatSenderController = chatSenderController
 
     def prepare(self, lock: Lock):

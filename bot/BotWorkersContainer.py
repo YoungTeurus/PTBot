@@ -13,6 +13,7 @@ class BotWorkersContainer:
 
     def addWorker(self, worker: BaseBotWorker) -> None:
         self.workers.append(worker)
+        print("Worker '{}' was added".format(worker))
         worker.prepare(self.lock)
 
     def stopAll(self) -> None:

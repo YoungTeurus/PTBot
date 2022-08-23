@@ -8,5 +8,5 @@ class Parrot(ChatObserver):
         self.csqs = csqs
 
     def notify(self, msg: ChatMessage):
-        if msg.sender != "The Fireclaw Archer":
+        if msg.sender != "- Ma-Zee-ic -":
             self.csqs.addMessageToQuery(msg.body)

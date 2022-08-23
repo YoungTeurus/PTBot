@@ -5,14 +5,14 @@ class ChatMessagePreprocessor:
     @staticmethod
     def prepareMessageForGlobal(message: str) -> list[str]:
         limit = MESSAGE_LEN_LIMITS["global"]
-        prefix = "/s "
+        prefix = "/s   "
 
         return ChatMessagePreprocessor.splitMessageAndAddPrefix(message, prefix, limit)
 
     @staticmethod
     def prepareMessageForWhisper(message: str, user: str) -> list[str]:
         limit = MESSAGE_LEN_LIMITS["whisper"]
-        prefix = "/w {} ".format(user)
+        prefix = "/w {}   ".format(user)
 
         return ChatMessagePreprocessor.splitMessageAndAddPrefix(message, prefix, limit)
 

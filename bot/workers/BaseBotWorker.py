@@ -7,25 +7,40 @@ class BaseBotWorker(Thread):
 
     def __init__(self):
         super().__init__()
-        self.daemon = True
+        self.daemon = False
         self.running = False
 
-    def prepare(self, lock: Lock):
+    def prepare(self, lock: Lock) -> None:
+        print("Worker '{}' is preparing".format(self))
+        self.preInit()
+
         self.lock = lock
         self.running = True
         self.start()
 
+        self.postInit()
+        print("Worker '{}' is prepared".format(self))
+
+    def preInit(self) -> None:
+        pass
+
+    def postInit(self) -> None:
+        pass
+
     def run(self) -> None:
+        print("Worker '{}' began to run".format(self))
         while self.running:
-            if self.hasWork():
-                with self.lock:
-                    self.doWork()
+            self._doWork()
 
     def hasWork(self) -> bool:
         return False
+
+    def _doWork(self) -> None:
+        pass
 
     def doWork(self) -> None:
         pass
 
     def interrupt(self):
+        print("Worker '{}' is interrupted".format(self))
         self.running = False

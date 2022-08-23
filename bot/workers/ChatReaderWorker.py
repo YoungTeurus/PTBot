@@ -1,9 +1,8 @@
-from threading import Lock
 from time import time
 
 from selenium.webdriver.remote.webelement import WebElement
 
-from bot.workers.BaseBotWorker import BaseBotWorker
+from bot.workers.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 from chat.ChatHistory import ChatHistory
 from chat.ChatMessage import ChatMessage
 from chat.ChatParser import ChatParser
@@ -11,7 +10,7 @@ from chat.ChatReader import ChatReader
 from properties import CHAT_READER_WORKER
 
 
-class ChatReaderWorker(BaseBotWorker):
+class ChatReaderWorker(WorkLockingBaseBotWorker):
     chatReader: ChatReader
     chatParser: ChatParser
     chatHistory: ChatHistory
@@ -24,9 +23,8 @@ class ChatReaderWorker(BaseBotWorker):
         self.chatParser = chatParser
         self.chatHistory = chatHistory
 
-    def prepare(self, lock: Lock):
+    def preInit(self) -> None:
         self.lastCheckTime = time()
-        super().prepare(lock)
 
     def hasWork(self) -> bool:
         return (time() - self.lastCheckTime) > self.secsBetweenChecks

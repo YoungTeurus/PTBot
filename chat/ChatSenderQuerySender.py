@@ -16,6 +16,7 @@ class ChatSenderQuerySender:
     def sendNextMessage(self) -> None:
         msgToSend = self.__sendQuery[0]
         try:
+            print("Sending message '{}'".format(msgToSend))
             self.__chatSender.sendMessage(msgToSend)
             self.__sendQuery.remove(msgToSend)
         except RuntimeError as err:
