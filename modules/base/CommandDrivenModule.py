@@ -53,12 +53,9 @@ class CommandDrivenModule(ChatObserver):
         self.addCommand(chatCommand)
 
     def notify(self, msg: ChatMessage) -> NotifyAction:
-        # TODO: разделять по пробелам, позволяя вводить аргументы в кавычках
         if not msg.body.startswith(COMMAND_PREFIX):
             return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
-        commandAndArgs = msg.body[1:].split(" ")
-        command = commandAndArgs[0]
-        args = commandAndArgs[1:]
+        command, args = CommandDrivenModule.getCommandAndArgs(msg.body)
 
         if command in self.commands:
             currentCommand = self.commands[command]
@@ -68,6 +65,14 @@ class CommandDrivenModule(ChatObserver):
                 self.onError(command, msg.sender, args, "Length of args is lesser than args len for command")
             currentCommand.action(args)
         return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
+
+    @staticmethod
+    def getCommandAndArgs(msgBody: str) -> tuple[str, list[str]]:
+        # TODO: разделять по пробелам, позволяя вводить аргументы в кавычках
+        commandAndArgs = msgBody[1:].split(" ")
+        command = commandAndArgs[0]
+        args = commandAndArgs[1:]
+        return command, args
 
     def onError(self, command: str, msgSender: str, args: list[str], reason: str) -> None:
         print("Error! command = {}, msgSender = {}, args = {}, reason = {}".format(command, msgSender, args, reason))
