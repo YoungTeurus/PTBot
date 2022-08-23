@@ -1,6 +1,5 @@
 from chat.ChatMessage import ChatMessage
-from chat.ChatObserver import ChatObserver
-
+from chat.ChatObserver import ChatObserver, NotifyAction
 
 MAX_HISTORY_SIZE = 500
 
@@ -23,5 +22,7 @@ class ChatHistory:
 
     def appendHistory(self, msg: ChatMessage) -> None:
         for obs in self.observers:
-            obs.notify(msg)
+            result: NotifyAction = obs.notify(msg)
+            if result == NotifyAction.END_NOTIFY_CHAIN:
+                break
         self.history.append(msg)

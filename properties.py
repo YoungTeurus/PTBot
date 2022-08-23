@@ -1,6 +1,6 @@
 LOGIN_SETTINGS: dict[str, str] = {
-    "remember_me": "Wq6mNx90RmEMCm8p0oYECV9tFcmLX%2F2hhfc4ky25ijLR1QuQOZGwiK28eIdfyCZjOm1Jg4r9p5w%2BvLcSjV52vA%3D%3D%7C%2BxovLSiDn%2FTjViZ%2BI%2BtsXIZQEfnvnf24jZQVtVtA5gsrP1VA9uqQTcRT7mNObw0kighEbnjvT7kP8dYAErqacg%3D%3D",
-    "connect.sid": "s%3A5XIwt8JkaNkRMvtwx6EyEAe9XsWnckA_.%2BM5TKcHINFFXeeBmcKM1sHuZrMZu8PgPNQD0R9hqebk"
+    "remember_me": "w5kQUD%2FNlYvg9DfjfOifGUpGD2wt%2FDng%2FL0kF5Vdz%2FxGYaA12KWyAQBA%2FoGUSKUJFJT7%2BD27h0E%2FQOLIQGflyw%3D%3D%7CoRZ6%2BJhNYH%2F%2B0c64Vg50cN%2FsMEqBrhk8ku%2B%2BtSX465sXSn%2BWA3NUQ1olkgF8OYYQxU1Dz40UegTEZJ1rq68eqQ%3D%3D",
+    "connect.sid": "s%3AFJ4JWi8sOzrO7MVMTjEVYYFtv4Y1Z_D0.wUniigKa91KHEiEGtxTmg5KTqs7myuywV1uDRl64BoM"
 }
 
 WAIT_SETTINGS: dict[str, float] = {
@@ -24,3 +24,5 @@ CHAT_SENDER_WORKER = {
 CHAT_READER_WORKER = {
     "secsBetweenChecks": 1
 }
+
+COMMAND_PREFIX = "!"

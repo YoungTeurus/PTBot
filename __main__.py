@@ -13,6 +13,7 @@ from driver.ElementManipulator import ElementManipulator
 from driver.LocalStorage import LocalStorage
 from modules.ConsoleHistoryWriter import ConsoleHistoryWriter
 from modules.Parrot import Parrot
+from modules.TestCommandModule import TestCommandModule
 from workflow import logInPT, enterGame
 
 if __name__ == "__main__":
@@ -33,6 +34,9 @@ if __name__ == "__main__":
 
     ch = ChatHistory()
     ch.addObserver(ConsoleHistoryWriter())
-    ch.addObserver(Parrot(csqs))
+    # ch.addObserver(Parrot(csqs))
 
     bwc.addWorker(ChatReaderWorker(cr, cp, ch))
+
+    ch.addObserver(TestCommandModule(csqs))
+

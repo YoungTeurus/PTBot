@@ -9,6 +9,8 @@ ELEMENT_CALLBACK = Callable[[WebElement], None]
 ELEMENTS_CALLBACK = Callable[[list[WebElement]], None]
 ELEMENT_PREDICATE = Callable[[WebElement], bool]
 
+STRING_PREDICATE = Callable[[str], bool]
+
 
 def runtimeErrorSupplier(msg: str) -> CALLBACK_FUNCTION:
     def wrapper():
