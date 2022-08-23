@@ -1,5 +1,7 @@
 from properties import MESSAGE_LEN_LIMITS
 
+NEXT_LINE_SYMBOL = "-"
+
 
 class ChatMessagePreprocessor:
     @staticmethod
@@ -19,8 +21,12 @@ class ChatMessagePreprocessor:
     @staticmethod
     def splitMessageAndAddPrefix(message: str, prefix: str, limit: int) -> list[str]:
         resultMessages = []
-        parts = len(message) // limit
-        for i in range(parts + 1):
-            resultMessages.append(message[limit * i: limit * (i + 1)])
+        remainingMessage = message
+        while len(remainingMessage) > limit:
+            partToSend = remainingMessage[: limit + 1]
+            resultMessages.append(partToSend)
+            # Everything after 'partToSend' is remaining:
+            remainingMessage = NEXT_LINE_SYMBOL + remainingMessage[limit + 1:]
+        resultMessages.append(remainingMessage)
         resultMessages[0] = prefix + resultMessages[0]
         return resultMessages

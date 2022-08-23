@@ -45,6 +45,7 @@ class ChatParser:
                 builder.receiver = BOT_NAME
         elif type.isAnnouncement or type.isSystem:
             builder.receiver = BOT_NAME
+            builder.sender = name if len(name) > 0 else None
         else:
             builder.sender = name
         builder.body = body

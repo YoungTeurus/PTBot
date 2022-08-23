@@ -1,6 +1,6 @@
 LOGIN_SETTINGS: dict[str, str] = {
-    "remember_me": "yENZawrGJVq3eqQdPo2JzTlUt7YfbxR%2FQynvFStMNmXsAJyqm7ILtc3HRrZTeUt3bCp6tFb2DK4gHsAdwfqJZg%3D%3D%7CmZjdpEppwXyGdmmEJb9ERQ4KHK8V9LZrv6nnwKT8jhgJbltrU9waWYHOSLAUMS%2BVRNQNBniL4uxd8Te8xpFKJA%3D%3D",
-    "connect.sid": "s%3A1kdC_Wk2Fmdtq75hO7n3u6fmxSxXQcyd.h%2FHlceueScRGsFEwOFdCRf0SKPQSO1sM8Xs9ua9mpe4"
+    "remember_me": "Wq6mNx90RmEMCm8p0oYECV9tFcmLX%2F2hhfc4ky25ijLR1QuQOZGwiK28eIdfyCZjOm1Jg4r9p5w%2BvLcSjV52vA%3D%3D%7C%2BxovLSiDn%2FTjViZ%2BI%2BtsXIZQEfnvnf24jZQVtVtA5gsrP1VA9uqQTcRT7mNObw0kighEbnjvT7kP8dYAErqacg%3D%3D",
+    "connect.sid": "s%3A5XIwt8JkaNkRMvtwx6EyEAe9XsWnckA_.%2BM5TKcHINFFXeeBmcKM1sHuZrMZu8PgPNQD0R9hqebk"
 }
 
 WAIT_SETTINGS: dict[str, float] = {

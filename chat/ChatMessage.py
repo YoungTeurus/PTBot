@@ -59,12 +59,12 @@ class ChatMessage:
 
     class Builder:
         type: ChatMessageType
-        lead: str
-        timestamp: time
-        label: str
-        sender: str
-        receiver: str
-        body: str
+        lead: str = None
+        timestamp: time = None
+        label: str = None
+        sender: str = None
+        receiver: str = None
+        body: str = None
 
         def build(self) -> ChatMessage:
             return ChatMessage(self.type, self.lead, self.timestamp, self.label, self.sender, self.receiver, self.body)

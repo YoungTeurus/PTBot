@@ -20,9 +20,6 @@ def CLICK_ELEMENT(element: WebElement) -> None:
 
 def SEND_KEYS(keys: str) -> ELEMENT_CALLBACK:
     def wrapper(element: WebElement):
-        # for key in keys:
-        #     element.send_keys(key)
-        #     # time.sleep(0.01)
         element.send_keys(keys)
     return wrapper
 

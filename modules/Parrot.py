@@ -9,4 +9,4 @@ class Parrot(ChatObserver):
 
     def notify(self, msg: ChatMessage):
         if msg.sender != "- Ma-Zee-ic -":
-            self.csqs.addMessageToQuery(msg.body)
+            self.csqs.addMessageToQuery('{} сказал(а) {}'.format(msg.sender, msg.body))
