@@ -2,7 +2,7 @@ from time import time
 
 from selenium.webdriver.remote.webelement import WebElement
 
-from bot.workers.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
+from bot.workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 from chat.ChatHistory import ChatHistory
 from chat.ChatMessage import ChatMessage
 from chat.ChatParser import ChatParser
