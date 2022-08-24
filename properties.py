@@ -1,6 +1,6 @@
 LOGIN_SETTINGS: dict[str, str] = {
-    "remember_me": "30ZVtXQhekI9ptrgNxslR6Y9KQAFABaIn5grlft2%2BI8iInMbGVDarc%2F4Mle6DgN3WKzInqhZVJ6mxHMvvE6vTA%3D%3D%7COamkeuvBZ%2BaqoI70iqSjXy7VOFK4txt%2F2eGVaGs6sE5A1QjPtV57JlOG5eJlexZNRKIACaqsLAgih8qtZPoFdg%3D%3D",
-    "connect.sid": "s%3AB0W39nS7jsSYVwKXhXYC1UlL58m5OVp3.OpSpNzaB%2Fs%2FVKHnMzpK43StLBDwJSYfXAGO83UbB5%2F8"
+    "remember_me": "bnhvmbvu4z8zhspdWErSRzkhjthGrrNhFbjW5e8%2BX2WIYcVRaTaJ4L4pFqQK1iH6AwvwC0qnYo5v5oArolWtVg%3D%3D%7CprfQQBms4wHJVkjU0MkU6OSdcsq0oZrlsTg2TJ9JUWV41Vjxrle8UwicjEAUzO15wqrvyHRYmXZbyrOp4%2Bkd8g%3D%3D",
+    "connect.sid": "s%3A5Vzusjv9xqm4N_hAgo5fOXl2GLs-W620.ilcN4%2FHELZlnBVhblHgBTh%2Faa5VfMaYsE574BClICJI"
 }
 
 WAIT_SETTINGS: dict[str, float] = {
@@ -26,3 +26,4 @@ CHAT_READER_WORKER = {
 }
 
 COMMAND_PREFIX = "!"
+SELF_IDENTIFY_MESSAGE_LENGTH = 10

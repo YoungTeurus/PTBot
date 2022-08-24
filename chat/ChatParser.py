@@ -41,11 +41,11 @@ class ChatParser:
 
             if hasPrefixTo:
                 builder.receiver = name
+                type.isSentByBot = True
             else:
                 builder.sender = name
-        elif type.isAnnouncement or type.isSystem:
-            builder.sender = name if len(name) > 0 else None
-        else:
+                type.isSentToBot = True
+        elif len(name) > 0:
             builder.sender = name
         builder.type = type
         builder.body = body

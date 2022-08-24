@@ -4,7 +4,7 @@ from chat.ChatObserver import ChatObserver, NotifyAction
 
 class SelfAwareChatObserver(ChatObserver):
     def notify(self, msg: ChatMessage) -> NotifyAction:
-        if msg.type.sentByBot:
+        if msg.type.isSentByBot:
             return self.doOnOwnMessage(msg)
         else:
             return self.doOnOtherMessage(msg)

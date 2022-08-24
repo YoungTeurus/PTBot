@@ -12,13 +12,15 @@ class ChatMessageType:
     isSystem: bool
     isWhisper: bool
     isAnnouncement: bool
-    sentByBot: bool
+    isSentByBot: bool
+    isSentToBot: bool
 
     def __init__(self):
         self.isSystem = False
         self.isWhisper = False
         self.isAnnouncement = False
-        self.sentByBot = False
+        self.isSentByBot = False
+        self.isSentToBot = False
 
 
 class ChatMessage:
