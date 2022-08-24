@@ -33,7 +33,7 @@ if __name__ == "__main__":
     enterGame(manipulator)
 
     cr = ChatReader(manipulator, localStorage)
-    cp = ChatParser(bp)
+    cp = ChatParser()
     cs = ChatSender(manipulator)
 
     bwc = BotWorkersContainer()
