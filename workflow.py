@@ -21,8 +21,3 @@ def enterGame(manipulator: ElementManipulator) -> None:
         "/html/body/pony-town-app/div[2]/main/home/div/div[2]/div/div/div[8]/play-box/div[1]/div/button[1]",
         orElse=runtimeErrorSupplier("Login failed! Check cookies!")
     )
-
-
-def getSkinName(manipulator: ElementManipulator) -> str:
-    return manipulator.findOne('//input[contains(@aria-label, "Name of your character")]') \
-        .get_attribute("value")

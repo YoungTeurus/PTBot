@@ -1,7 +1,14 @@
+from enum import Enum
+
+
+class BotState(Enum):
+    STARTING = 1
+    INITIALIZED = 2
+
 class BotProperties:
     botName: str | None
-    loggedIn: bool
+    state: BotState
 
     def __init__(self):
         self.botName = None
-        self.loggedIn = False
+        self.state = BotState.STARTING

@@ -17,10 +17,9 @@ from driver.LocalStorage import LocalStorage
 from modules.ChatToConsoleLogger import ChatToConsoleLogger
 from modules.Parrot import Parrot
 from modules.SelfIdentify import SelfIdentify
-from modules.TestCommandModule import TestCommandModule
 from modules.TestCommandWithHistoryModule import TestCommandWithHistoryModule
-from utils.BotProperites import BotProperties
-from workflow import logInPT, enterGame, getSkinName
+from utils.BotProperites import BotProperties, BotState
+from workflow import logInPT, enterGame
 
 if __name__ == "__main__":
     driver: WebDriver = DriverInitializer.startFirefoxDriver()
@@ -50,6 +49,7 @@ if __name__ == "__main__":
 
     def updateBotNameAndLoadCustomModules(botName: str) -> None:
         bp.botName = botName
+        bp.state = BotState.INITIALIZED
         loadCustomModules()
 
     def loadCustomModules() -> None:
