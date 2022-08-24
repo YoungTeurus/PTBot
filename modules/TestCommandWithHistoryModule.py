@@ -27,9 +27,9 @@ class TestCommandWithHistoryModule(CommandDrivenModule):
                                     .format(command, msgSender, args, reason))
 
     def startLogging(self, msg: ChatMessage, args: list[str]) -> None:
-        msgSender = msg.sender
-        if msgSender == "- Ma-Zee-ic -":
+        if msg.type.isSentByBot:
             return
+        msgSender = msg.sender
         if msgSender in self.history:
             self.csqs.addMessageToQuery("Уже слушаю сообщения от '{}', напишите '!stop' для остановки.".format(msgSender))
             return
@@ -37,9 +37,9 @@ class TestCommandWithHistoryModule(CommandDrivenModule):
         self.csqs.addMessageToQuery("Слушаю сообщения от '{}', напишите '!stop' для остановки...".format(msgSender))
 
     def stopLogging(self, msg: ChatMessage, args: list[str]) -> None:
-        msgSender = msg.sender
-        if msgSender == "- Ma-Zee-ic -":
+        if msg.type.isSentByBot:
             return
+        msgSender = msg.sender
         if msgSender not in self.history:
             self.csqs.addMessageToQuery("Нет ни одного сохранённого сообщения от '{}'!".format(msgSender))
             return
@@ -56,9 +56,9 @@ class TestCommandWithHistoryModule(CommandDrivenModule):
         self.history.pop(msgSender)
 
     def saveMessage(self, msg: ChatMessage) -> None:
-        msgSender = msg.sender
-        if msgSender == "- Ma-Zee-ic -":
+        if msg.type.isSentByBot:
             return
+        msgSender = msg.sender
         if msgSender in self.history:
             msgBody = msg.body
             print("Сохраняю сообщение от '{}' : '{}'".format(msgSender, msgBody))
