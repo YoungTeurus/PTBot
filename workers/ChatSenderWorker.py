@@ -1,7 +1,7 @@
 from time import time
 from threading import Lock
 
-from bot.workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
+from workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 from chat.ChatSenderQuerySender import ChatSenderQuerySender
 from properties import CHAT_SENDER_WORKER
 

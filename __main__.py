@@ -1,10 +1,10 @@
-import sys
-
 from selenium.webdriver.firefox.webdriver import WebDriver
 
-from bot.BotWorkersContainer import BotWorkersContainer
-from bot.workers.ChatReaderWorker import ChatReaderWorker
-from bot.workers.ChatSenderWorker import ChatSenderWorker
+from activities.ActivityContainer import ActivityContainer
+from workers.ActivityWorker import ActivityWorker
+from workers.BotWorkersContainer import BotWorkersContainer
+from workers.ChatReaderWorker import ChatReaderWorker
+from workers.ChatSenderWorker import ChatSenderWorker
 from chat.ChatMessageProcessor import ChatMessageProcessor
 from chat.ChatProvider import ChatProvider
 from chat.ChatReader import ChatReader
@@ -31,6 +31,7 @@ if __name__ == "__main__":
     manipulator: ElementManipulator = ElementManipulator(driver)
 
     enterGame(manipulator)
+    # waitForGameLoad(manipulator)
 
     cr = ChatReader(manipulator, localStorage)
     cparse = ChatParser()
@@ -40,12 +41,15 @@ if __name__ == "__main__":
     bwc = BotWorkersContainer()
 
     csqs = ChatSenderQuerySender(cs)
-    bwc.addWorker(ChatSenderWorker(csqs))
+    bwc.add(ChatSenderWorker(csqs))
 
     cprovide = ChatProvider()
     cprovide.addObserver(ChatToConsoleLogger())
 
-    bwc.addWorker(ChatReaderWorker(cr, cparse, cprovide, cmp))
+    bwc.add(ChatReaderWorker(cr, cparse, cprovide, cmp))
+
+    ac = ActivityContainer()
+    bwc.add(ActivityWorker(ac))
 
     def updateBotNameAndLoadCustomModules(botName: str) -> None:
         bp.botName = botName

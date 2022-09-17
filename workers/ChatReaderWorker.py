@@ -2,14 +2,13 @@ from time import time
 
 from selenium.webdriver.remote.webelement import WebElement
 
-from bot.workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
+from workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 from chat.ChatMessageProcessor import ChatMessageProcessor
 from chat.ChatProvider import ChatProvider
 from chat.ChatMessage import ChatMessage
 from chat.ChatParser import ChatParser
 from chat.ChatReader import ChatReader
 from properties import CHAT_READER_WORKER
-from utils.BotProperites import BotProperties
 
 
 class ChatReaderWorker(WorkLockingBaseBotWorker):

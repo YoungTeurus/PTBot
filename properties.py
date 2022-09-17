@@ -1,11 +1,16 @@
 LOGIN_SETTINGS: dict[str, str] = {
-    "remember_me": "bnhvmbvu4z8zhspdWErSRzkhjthGrrNhFbjW5e8%2BX2WIYcVRaTaJ4L4pFqQK1iH6AwvwC0qnYo5v5oArolWtVg%3D%3D%7CprfQQBms4wHJVkjU0MkU6OSdcsq0oZrlsTg2TJ9JUWV41Vjxrle8UwicjEAUzO15wqrvyHRYmXZbyrOp4%2Bkd8g%3D%3D",
-    "connect.sid": "s%3A5Vzusjv9xqm4N_hAgo5fOXl2GLs-W620.ilcN4%2FHELZlnBVhblHgBTh%2Faa5VfMaYsE574BClICJI"
+    "remember_me": "diey8s3nwcg8ztS2n09jCF0kuTgSe4oxzoup24upfcv%2BJs%2Bdfahj6n3FO1qlOWyEU49LESGP2xiRWL8iRA%2FWEg%3D%3D%7Cufe%2BPGkD8IGKyG58QO4b0pg5kbGM9uG7DWbHZ62aGmHisUMuqD%2BAltJJk3hWywJIb0aegMMlOFAzZTwUHMB%2FDw%3D%3D",
+    "connect.sid": "s%3A0UmnX5wFZ99S2EmFzcSWqUxYZGt86kTv.lxujl7Jw30S%2F%2FL8%2FyPbPdqt%2Fl35zf9o%2BtqhzMJctyGE"
 }
 
 WAIT_SETTINGS: dict[str, float] = {
     "timeout": 2,
     "pollFrequency": 0.5
+}
+
+GAME_LOAD_WAIT_SETTINGS: dict[str, float] = {
+    "timeout": 10,
+    "pollFrequency": 1
 }
 
 PONY_TOWN_URL: str = "http://pony.town"
@@ -23,6 +28,10 @@ CHAT_SENDER_WORKER = {
 
 CHAT_READER_WORKER = {
     "secsBetweenChecks": 1
+}
+
+ACTIVITY_WORKER = {
+    "secsBetweenUpdates": 5
 }
 
 COMMAND_PREFIX = "!"
