@@ -1,4 +1,4 @@
-from chat.ChatMessage import ChatMessage, ChatMessageType
+from chat.ChatMessage import ChatMessage
 from properties import DEFAULT_LOG_BOT_NICKNAME
 from utils.BotProperites import BotProperties
 
@@ -24,7 +24,6 @@ class OutgoingChatMessageFactory:
     def __createBaseMessage(self, body: str) -> ChatMessage.Builder:
         builder = ChatMessage.Builder()
 
-        builder.type = ChatMessageType()
         builder.type.isSentByBot = True
         if self.botProperties.botName is not None:
             builder.sender = self.botProperties.botName

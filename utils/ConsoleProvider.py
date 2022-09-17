@@ -1,5 +1,7 @@
 from threading import Lock
 
+from utils.Utils import T_SUPPLIER, T
+
 
 class ConsoleProvider:
     lock: Lock
@@ -14,3 +16,7 @@ class ConsoleProvider:
     def input(self, prompt: object) -> str:
         with self.lock:
             return input(prompt)
+
+    def runInConsoleLockWithResult(self, func: T_SUPPLIER) -> T:
+        with self.lock:
+            return func()

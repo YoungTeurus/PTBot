@@ -64,11 +64,15 @@ class ChatMessage:
     class Builder:
         type: ChatMessageType
         lead: str = None
-        timestamp: datetime.datetime = datetime.datetime.now()
+        timestamp: datetime.datetime
         label: str = None
         sender: str = None
         receiver: str = None
         body: str = None
+
+        def __init__(self):
+            self.type = ChatMessageType()
+            self.timestamp = datetime.datetime.now()
 
         def build(self) -> ChatMessage:
             return ChatMessage(self.type, self.lead, self.timestamp, self.label, self.sender, self.receiver, self.body)

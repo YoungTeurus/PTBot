@@ -3,11 +3,11 @@
 DEFAULT_LOG_BOT_NICKNAME = "BOT"
 
 # Set to True to disable logging in game
-LOCAL_MODE = True
+LOCAL_MODE = False
 
 LOGIN_SETTINGS: dict[str, str] = {
-    "remember_me": "diey8s3nwcg8ztS2n09jCF0kuTgSe4oxzoup24upfcv%2BJs%2Bdfahj6n3FO1qlOWyEU49LESGP2xiRWL8iRA%2FWEg%3D%3D%7Cufe%2BPGkD8IGKyG58QO4b0pg5kbGM9uG7DWbHZ62aGmHisUMuqD%2BAltJJk3hWywJIb0aegMMlOFAzZTwUHMB%2FDw%3D%3D",
-    "connect.sid": "s%3A0UmnX5wFZ99S2EmFzcSWqUxYZGt86kTv.lxujl7Jw30S%2F%2FL8%2FyPbPdqt%2Fl35zf9o%2BtqhzMJctyGE"
+    "remember_me": "80YA33jPU4uq4ToixAJ2u8kBlztqpL7eQIKdBiz9t1LpPX78dQVcwoUJ9xRBdoBkkPvrLeMmhTa%2FVDVgrzjqnw%3D%3D%7C5lyr8VE0sDCEFV6543sELwurfBKvCqZANuuUKHUkhYFN1xCnqQJN%2FLwnxWHnn9Zoujxyft20OYty0n9zD4ekvQ%3D%3D",
+    "connect.sid": "s%3A_bN_fVJAFCyE5dZhdclNkNGsP5g6zx0I.fgfUzofQipWNbv%2FjwPC7bYABODwCa78JxWFkFzqzgvU"
 }
 
 WAIT_SETTINGS: dict[str, float] = {
@@ -49,3 +49,4 @@ SELF_IDENTIFY_MESSAGE_LENGTH = 10
 
 class LOGGING:
     logWorkers: bool = False
+    logUpdatingActivities: bool = False

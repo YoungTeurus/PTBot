@@ -1,7 +1,7 @@
 from time import time
 
 from activities.ActivityContainer import ActivityContainer
-from properties import ACTIVITY_WORKER
+from properties import ACTIVITY_WORKER, LOGGING
 from utils.ConsoleProvider import ConsoleProvider
 from workers.interfaces.NonLockingBaseBotWorker import NonLockingBaseBotWorker
 
@@ -22,6 +22,7 @@ class ActivityWorker(NonLockingBaseBotWorker):
         return (time() - self.lastUpdateTime) > self.secsBetweenUpdates
 
     def doWork(self) -> None:
-        self.cp.print("Updating activities ({})...".format(self.activityContainer.size()))
+        if LOGGING.logUpdatingActivities:
+            self.cp.print("Updating activities ({})...".format(self.activityContainer.size()))
         self.activityContainer.updateAll()
         self.lastUpdateTime = time()

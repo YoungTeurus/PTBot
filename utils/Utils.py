@@ -1,8 +1,11 @@
-from typing import Callable
+from typing import Callable, TypeVar
 
 from selenium.webdriver.remote.webelement import WebElement
 
+T = TypeVar('T')
+
 CALLBACK_FUNCTION = Callable[[], None]
+T_SUPPLIER = Callable[[], T]
 ELEMENT_SUPPLIER = Callable[[], WebElement]
 ELEMENTS_SUPPLIER = Callable[[], list[WebElement]]
 ELEMENT_CALLBACK = Callable[[WebElement], None]

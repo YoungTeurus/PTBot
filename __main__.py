@@ -29,7 +29,7 @@ from workers.InputFromConsoleWorker import InputFromConsoleWorker
 from workflow import logInPT, enterGame
 
 if __name__ == "__main__":
-    cp: ConsoleProvider = ConsoleProvider()
+    cp = ConsoleProvider()
 
     cp.print("Starting bot...")
 
@@ -70,23 +70,28 @@ if __name__ == "__main__":
         bwc.add(ChatSenderWorker(csqs, cp))
     else:
         cp.print("Running in local mode!")
-        cs = FakeChatSender(cprovide, cp)
+        cs = FakeChatSender(cprovide)
         csqs = FakeChatSenderQuerySender(cs)
 
 
-    def updateBotNameAndLoadCustomModules(botName: str) -> None:
+    def updateBotNameAndState(botName: str) -> None:
         bp.botName = botName
         bp.state = BotState.INITIALIZED
-        loadCustomModules()
 
 
     def loadCustomModules() -> None:
         cp.print("Loading custom modules (observers)...")
-        bwc.add(InputFromConsoleWorker(csqs, cp))
+        bwc.add(InputFromConsoleWorker(cprovide, cp, bp))
 
         cprovide.addObserver(Parrot(csqs, ocmf))
         cprovide.addObserver(TestCommandWithHistoryModule(csqs, ocmf, cp))
         cp.print("Finished loading custom modules!")
 
 
-    cprovide.addObserver(SelfIdentify(cprovide, csqs, ocmf, cp, updateBotNameAndLoadCustomModules))
+    selfIdentify = SelfIdentify(cprovide, csqs, ocmf, cp, updateBotNameAndState)
+    cprovide.addObserver(selfIdentify)
+
+    while bp.state != BotState.INITIALIZED:
+        pass
+
+    loadCustomModules()
