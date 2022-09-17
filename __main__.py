@@ -20,6 +20,7 @@ from modules.SelfIdentify import SelfIdentify
 from modules.TestCommandWithHistoryModule import TestCommandWithHistoryModule
 from properties import LOCAL_MODE
 from utils.BotProperites import BotProperties, BotState
+from utils.ConsoleProvider import ConsoleProvider
 from workers.ActivityWorker import ActivityWorker
 from workers.BotWorkersContainer import BotWorkersContainer
 from workers.ChatReaderWorker import ChatReaderWorker
@@ -28,18 +29,20 @@ from workers.InputFromConsoleWorker import InputFromConsoleWorker
 from workflow import logInPT, enterGame
 
 if __name__ == "__main__":
-    print("Starting bot...")
+    cp: ConsoleProvider = ConsoleProvider()
+
+    cp.print("Starting bot...")
 
     bp = BotProperties()
     cmp = IncomingChatMessageProcessor(bp)
 
-    bwc = BotWorkersContainer()
+    bwc = BotWorkersContainer(cp)
 
     cprovide = ChatProvider()
-    cprovide.addObserver(ChatToConsoleLogger())
+    cprovide.addObserver(ChatToConsoleLogger(cp))
 
-    ac = ActivityContainer()
-    bwc.add(ActivityWorker(ac))
+    ac = ActivityContainer(cp)
+    bwc.add(ActivityWorker(ac, cp))
 
     ocmf = OutgoingChatMessageFactory(bp)
 
@@ -47,28 +50,29 @@ if __name__ == "__main__":
 
     if not LOCAL_MODE:
         driver: WebDriver = DriverInitializer.startFirefoxDriver()
-        print("Driver was initialized!")
+        cp.print("Driver was initialized!")
         localStorage: LocalStorage = LocalStorage(driver)
 
         logInPT(driver)
-        print("Logged in PT!")
+        cp.print("Logged in PT!")
         manipulator: ElementManipulator = ElementManipulator(driver)
 
         enterGame(manipulator)
-        print("Entered the game!")
+        cp.print("Entered the game!")
         # waitForGameLoad(manipulator)
 
         cr = ChatReader(manipulator, localStorage)
         cparse = ChatParser()
         cs = GameChatSender(manipulator)
-        csqs = GameChatSenderQuerySender(cs)
+        csqs = GameChatSenderQuerySender(cs, cp)
 
-        bwc.add(ChatReaderWorker(cr, cparse, cprovide, cmp))
-        bwc.add(ChatSenderWorker(csqs))
+        bwc.add(ChatReaderWorker(cr, cparse, cprovide, cmp, cp))
+        bwc.add(ChatSenderWorker(csqs, cp))
     else:
-        print("Running in local mode!")
-        cs = FakeChatSender(cprovide)
+        cp.print("Running in local mode!")
+        cs = FakeChatSender(cprovide, cp)
         csqs = FakeChatSenderQuerySender(cs)
+
 
     def updateBotNameAndLoadCustomModules(botName: str) -> None:
         bp.botName = botName
@@ -77,12 +81,12 @@ if __name__ == "__main__":
 
 
     def loadCustomModules() -> None:
-        print("Loading custom modules (observers)...")
-        bwc.add(InputFromConsoleWorker(csqs))
+        cp.print("Loading custom modules (observers)...")
+        bwc.add(InputFromConsoleWorker(csqs, cp))
 
         cprovide.addObserver(Parrot(csqs, ocmf))
-        cprovide.addObserver(TestCommandWithHistoryModule(csqs, ocmf))
-        print("Finished loading custom modules!")
+        cprovide.addObserver(TestCommandWithHistoryModule(csqs, ocmf, cp))
+        cp.print("Finished loading custom modules!")
 
 
-    cprovide.addObserver(SelfIdentify(cprovide, csqs, ocmf, updateBotNameAndLoadCustomModules))
+    cprovide.addObserver(SelfIdentify(cprovide, csqs, ocmf, cp, updateBotNameAndLoadCustomModules))

@@ -1,11 +1,15 @@
 from chat.ChatMessage import ChatMessage
 from chat.ChatProvider import ChatProvider
+from utils.ConsoleProvider import ConsoleProvider
+
 
 class FakeChatSender:
     chatProvider: ChatProvider
+    cp: ConsoleProvider
 
-    def __init__(self, chatProvider: ChatProvider):
+    def __init__(self, chatProvider: ChatProvider, cp: ConsoleProvider):
         self.chatProvider = chatProvider
+        self.cp = cp
 
     def sendMessage(self, message: ChatMessage) -> None:
         """
@@ -13,5 +17,5 @@ class FakeChatSender:
         отправляет это в chatProvider, как если бы бот
         действительно отправил это сообщение (бот услышит сам себя).
         """
-        print("Bot tried to send message to chat: {}".format(message))
+        self.cp.print("Bot tried to send message to chat: {}".format(message))
         self.chatProvider.cleanAndAddMultipleMessages([message])

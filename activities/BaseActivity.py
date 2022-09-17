@@ -1,25 +1,28 @@
 from threading import Lock
 
+from utils.ConsoleProvider import ConsoleProvider
 from utils.Utils import CALLBACK_FUNCTION
 
 
 class BaseActivity:
+    cp: ConsoleProvider
     lock: Lock
     running: bool
     selfRemove: CALLBACK_FUNCTION
 
-    def __init__(self):
+    def __init__(self, cp: ConsoleProvider):
         self.running = False
+        self.cp = cp
 
     def prepare(self, lock: Lock, selfRemove: CALLBACK_FUNCTION) -> None:
-        print("Activity '{}' is preparing...".format(self))
+        self.cp.print("Activity '{}' is preparing...".format(self))
 
         self.lock = lock
         self.selfRemove = selfRemove
         self.setup()
         self.running = True
 
-        print("Activity '{}' is prepared".format(self))
+        self.cp.print("Activity '{}' is prepared".format(self))
 
     def setup(self) -> None:
         """

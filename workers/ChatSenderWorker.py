@@ -2,6 +2,7 @@ from time import time
 
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from properties import CHAT_SENDER_WORKER
+from utils.ConsoleProvider import ConsoleProvider
 from workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 
 
@@ -10,8 +11,8 @@ class ChatSenderWorker(WorkLockingBaseBotWorker):
     lastMessageTime: float
     secsBetweenMessages: float = CHAT_SENDER_WORKER["secsBetweenMessages"]
 
-    def __init__(self, chatSenderController: ChatSenderQuerySender):
-        super().__init__()
+    def __init__(self, chatSenderController: ChatSenderQuerySender, cp: ConsoleProvider):
+        super().__init__(cp)
         self.chatSenderController = chatSenderController
 
     def preInit(self) -> None:

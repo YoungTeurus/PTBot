@@ -3,6 +3,7 @@ from typing import Callable
 from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import ChatObserver, NotifyAction
 from properties import COMMAND_PREFIX
+from utils.ConsoleProvider import ConsoleProvider
 from utils.Utils import STRING_PREDICATE
 
 # (args) => None
@@ -35,6 +36,7 @@ class ChatCommand:
 
 
 class CommandDrivenModule(ChatObserver):
+    cp: ConsoleProvider
     # command => ChatCommand
     commands: dict[str, ChatCommand]
     # (command, msg.sender, args, reason) => None
@@ -42,9 +44,10 @@ class CommandDrivenModule(ChatObserver):
     actionOnNonCommandInput: Callable[[ChatMessage], None] | None
     acceptNonCommandInputWithPrefix: bool
 
-    def __init__(self, actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
+    def __init__(self, cp: ConsoleProvider, actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
                  actionOnNonCommandInput: Callable[[ChatMessage], None] = None,
                  asseptNonCommandInputWithPrefix: bool = False):
+        self.cp = cp
         self.commands = {}
         self.actionOnCommandError = actionOnCommandError
         self.actionOnNonCommandInput = actionOnNonCommandInput
@@ -55,7 +58,7 @@ class CommandDrivenModule(ChatObserver):
 
     def addCommandCheckIfExists(self, chatCommand: ChatCommand):
         if chatCommand.command in self.commands:
-            print("Command '' was already in this module")
+            self.cp.print("Command '' was already in this module")
         self.addCommand(chatCommand)
 
     def notify(self, msg: ChatMessage) -> NotifyAction:
@@ -86,6 +89,6 @@ class CommandDrivenModule(ChatObserver):
         return command, args
 
     def onError(self, command: str, msgSender: str, args: list[str], reason: str) -> None:
-        print("Error! command = {}, msgSender = {}, args = {}, reason = {}".format(command, msgSender, args, reason))
+        self.cp.print("Error! command = {}, msgSender = {}, args = {}, reason = {}".format(command, msgSender, args, reason))
         if self.actionOnCommandError is not None:
             self.actionOnCommandError(command, msgSender, args, reason)

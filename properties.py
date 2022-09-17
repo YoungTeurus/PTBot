@@ -26,8 +26,8 @@ PATH_TO_FIREFOX_DRIVER: str = "./extra/geckodriver.exe"
 
 
 class MESSAGE_LEN_LIMITS:
-    globalChat = 72
-    whisperChat = 128
+    globalChat: int = 72
+    whisperChat: int = 128
 
 
 CHAT_SENDER_WORKER = {
@@ -38,9 +38,14 @@ CHAT_READER_WORKER = {
     "secsBetweenChecks": 1
 }
 
-ACTIVITY_WORKER = {
-    "secsBetweenUpdates": 5
-}
+
+class ACTIVITY_WORKER:
+    secsBetweenUpdates: float = 5
+
 
 COMMAND_PREFIX = "!"
 SELF_IDENTIFY_MESSAGE_LENGTH = 10
+
+
+class LOGGING:
+    logWorkers: bool = False

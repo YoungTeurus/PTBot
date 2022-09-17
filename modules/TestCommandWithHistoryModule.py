@@ -2,6 +2,7 @@ from chat.ChatMessage import ChatMessage
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.CommandDrivenModule import CommandDrivenModule, ChatCommand
+from utils.ConsoleProvider import ConsoleProvider
 
 
 class TestCommandWithHistoryModule(CommandDrivenModule):
@@ -11,8 +12,8 @@ class TestCommandWithHistoryModule(CommandDrivenModule):
     # player_name => msgs
     history: dict[str, list[str]]
 
-    def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory):
-        super().__init__(actionOnCommandError=self.sendErrorToChat,
+    def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory, cp: ConsoleProvider):
+        super().__init__(cp, actionOnCommandError=self.sendErrorToChat,
                          actionOnNonCommandInput=self.saveMessage,
                          asseptNonCommandInputWithPrefix=True)
         self.csqs = csqs
@@ -68,5 +69,5 @@ class TestCommandWithHistoryModule(CommandDrivenModule):
         msgSender = msg.sender
         if msgSender in self.history:
             msgBody = msg.body
-            print("Сохраняю сообщение от '{}' : '{}'".format(msgSender, msgBody))
+            self.cp.print("Сохраняю сообщение от '{}' : '{}'".format(msgSender, msgBody))
             self.history[msgSender].append(msgBody)
