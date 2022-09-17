@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import time
+import datetime
 
 UNKNOWN = "UNKNOWN"
 BOT_NAME = "BOT_NAME"
@@ -26,13 +26,13 @@ class ChatMessageType:
 class ChatMessage:
     type: ChatMessageType
     lead: str
-    timestamp: time
+    timestamp: datetime.datetime
     label: str
     sender: str
     receiver: str
     body: str
 
-    def __init__(self, type: ChatMessageType, lead: str, timestamp: time, label: str, sender: str, receiver: str,
+    def __init__(self, type: ChatMessageType, lead: str, timestamp: datetime.datetime, label: str, sender: str, receiver: str,
                  body: str):
         self.type = type
         self.lead = lead
@@ -64,7 +64,7 @@ class ChatMessage:
     class Builder:
         type: ChatMessageType
         lead: str = None
-        timestamp: time = None
+        timestamp: datetime.datetime = datetime.datetime.now()
         label: str = None
         sender: str = None
         receiver: str = None

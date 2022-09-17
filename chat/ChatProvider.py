@@ -14,6 +14,7 @@ class ChatProvider:
 
     def addObserver(self, observer: ChatObserver) -> None:
         self.observers.append(observer)
+        observer.startObserving()
 
     def removeObserver(self, observer: ChatObserver) -> None:
         self.observers.remove(observer)

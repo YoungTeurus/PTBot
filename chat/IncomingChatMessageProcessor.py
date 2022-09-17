@@ -2,7 +2,7 @@ from chat.ChatMessage import ChatMessage
 from utils.BotProperites import BotProperties
 
 
-class ChatMessageProcessor:
+class IncomingChatMessageProcessor:
     botProperties: BotProperties
 
     def __init__(self, botProperties: BotProperties):

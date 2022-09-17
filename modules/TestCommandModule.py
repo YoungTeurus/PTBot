@@ -1,12 +1,12 @@
 from chat.ChatMessage import ChatMessage
-from chat.ChatSenderQuerySender import ChatSenderQuerySender
-from modules.base.CommandDrivenModule import CommandDrivenModule, ACTION_CALLBACK, ChatCommand, ChatCommandArg
+from chat.GameChatSenderQuerySender import GameChatSenderQuerySender
+from modules.base.CommandDrivenModule import CommandDrivenModule, ChatCommand, ChatCommandArg
 
 
 class TestCommandModule(CommandDrivenModule):
-    csqs: ChatSenderQuerySender
+    csqs: GameChatSenderQuerySender
 
-    def __init__(self, csqs: ChatSenderQuerySender):
+    def __init__(self, csqs: GameChatSenderQuerySender):
         super().__init__()
         self.csqs = csqs
 
@@ -21,5 +21,5 @@ class TestCommandModule(CommandDrivenModule):
     def sayFirstArg(self, msg: ChatMessage, args: list[str]) -> None:
         textToSay = args[0]
         print("Command 'test' with argument '{}'".format(textToSay))
-        self.csqs.addMessageToQuery("Повторяю: '{}'".format(textToSay))
+        self.csqs.addMessage("Повторяю: '{}'".format(textToSay))
 

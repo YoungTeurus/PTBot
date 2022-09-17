@@ -1,6 +1,7 @@
 from selenium.webdriver import Keys
 from selenium.webdriver.remote.webelement import WebElement
 
+from chat.interfaces.ChatSender import ChatSender
 from driver.ElementManipulator import ElementManipulator
 from utils.Utils import runtimeErrorSupplier
 from utils.WebElementFunctions import SEND_KEYS, IS_NOT_INTERACTIVE, IS_INTERACTIVE
@@ -9,7 +10,7 @@ chatInputXPath = '//textarea[contains(@class,"chat-textarea")]'
 openChatBoxButtonXPath = '//*[@id="chat-box"]/ui-button'
 
 
-class ChatSender:
+class GameChatSender(ChatSender):
     manipulator: ElementManipulator
 
     def __init__(self, manipulator: ElementManipulator):

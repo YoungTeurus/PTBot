@@ -9,5 +9,11 @@ class NotifyAction(Enum):
 
 
 class ChatObserver:
+    def startObserving(self) -> None:
+        """
+        Выполняется после добавления наблюдателя в контейнер наблюдателей
+        """
+        pass
+
     def notify(self, msg: ChatMessage) -> NotifyAction:
         pass

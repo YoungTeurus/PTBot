@@ -1,4 +1,5 @@
 import datetime
+
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -32,7 +33,9 @@ class ChatParser:
 
         builder = ChatMessage.Builder()
         builder.lead = lead
-        builder.timestamp = datetime.datetime.strptime(timestamp, "%H:%M")
+        builder.timestamp = builder.timestamp.combine(
+            datetime.datetime.now(),
+            datetime.datetime.strptime(timestamp, "%H:%M").time())
         builder.label = label
         if type.isWhisper:
             msgText: str = chatLineDiv.text

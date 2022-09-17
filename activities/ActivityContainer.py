@@ -25,3 +25,6 @@ class ActivityContainer:
     def updateAll(self) -> None:
         for activity in self.activities:
             activity.doUpdate()
+
+    def size(self) -> int:
+        return len(self.activities)
