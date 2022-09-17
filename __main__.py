@@ -24,6 +24,7 @@ from workers.ActivityWorker import ActivityWorker
 from workers.BotWorkersContainer import BotWorkersContainer
 from workers.ChatReaderWorker import ChatReaderWorker
 from workers.ChatSenderWorker import ChatSenderWorker
+from workers.InputFromConsoleWorker import InputFromConsoleWorker
 from workflow import logInPT, enterGame
 
 if __name__ == "__main__":
@@ -77,6 +78,8 @@ if __name__ == "__main__":
 
     def loadCustomModules() -> None:
         print("Loading custom modules (observers)...")
+        bwc.add(InputFromConsoleWorker(csqs))
+
         cprovide.addObserver(Parrot(csqs, ocmf))
         cprovide.addObserver(TestCommandWithHistoryModule(csqs, ocmf))
         print("Finished loading custom modules!")

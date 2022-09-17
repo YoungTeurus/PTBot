@@ -1,4 +1,3 @@
-from threading import Lock
 from time import time
 
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
@@ -15,9 +14,8 @@ class ChatSenderWorker(WorkLockingBaseBotWorker):
         super().__init__()
         self.chatSenderController = chatSenderController
 
-    def prepare(self, lock: Lock):
+    def preInit(self) -> None:
         self.lastMessageTime = time()
-        super().prepare(lock)
 
     def hasWork(self) -> bool:
         return self.chatSenderController.hasMsgs() and \

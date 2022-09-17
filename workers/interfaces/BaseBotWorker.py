@@ -30,12 +30,12 @@ class BaseBotWorker(Thread):
     def run(self) -> None:
         print("Worker '{}' began to run".format(self))
         while self.running:
-            self._doWork()
+            self._doWhileRunning()
 
     def hasWork(self) -> bool:
         return False
 
-    def _doWork(self) -> None:
+    def _doWhileRunning(self) -> None:
         pass
 
     def doWork(self) -> None:

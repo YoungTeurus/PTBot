@@ -9,6 +9,10 @@ class ChatSenderQuerySender:
         """
         self.addMessage(ocmf.globalMsg(msg))
 
+    def addMessages(self, msgs: list[ChatMessage]) -> None:
+        for msg in msgs:
+            self.addMessage(msg)
+
     def addMessage(self, msg: ChatMessage) -> None:
         """
         Добавляет сообщение в очередь на отправку.

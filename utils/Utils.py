@@ -10,6 +10,7 @@ ELEMENTS_CALLBACK = Callable[[list[WebElement]], None]
 ELEMENT_PREDICATE = Callable[[WebElement], bool]
 
 STRING_PREDICATE = Callable[[str], bool]
+STRING_CONSUMER = Callable[[str], None]
 
 
 def runtimeErrorSupplier(msg: str) -> CALLBACK_FUNCTION:

@@ -12,9 +12,10 @@ class BotWorkersContainer:
         self.workers = []
 
     def add(self, worker: BaseBotWorker) -> None:
-        self.workers.append(worker)
-        print("Worker '{}' was added".format(worker))
-        worker.prepare(self.lock)
+        with self.lock:
+            self.workers.append(worker)
+            print("Worker '{}' was added".format(worker))
+            worker.prepare(self.lock)
 
     def stopAll(self) -> None:
         for worker in self.workers:
