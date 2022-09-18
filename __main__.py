@@ -15,12 +15,13 @@ from driver.DriverInitializer import DriverInitializer
 from driver.ElementManipulator import ElementManipulator
 from driver.LocalStorage import LocalStorage
 from modules.ChatToConsoleLogger import ChatToConsoleLogger
-from modules.ConsoleToChatSender import ConsoleToChatSender
 from modules.SelfIdentify import SelfIdentify
 from modules.commands.AddAdminCommandModule import AddAdminCommandModule
 from modules.commands.Recorder import Recorder
 from modules.commands.SwitchableParrot import SwitchableParrot
 from modules.console.CommandController import CommandController
+from modules.console.ConsoleToBotSender import ConsoleToBotSender
+from modules.console.ConsoleToChatSender import ConsoleToChatSender
 from properties import LOCAL_MODE
 from utils.BotProperites import BotProperties, BotState
 from utils.ConsoleProvider import ConsoleProvider
@@ -89,7 +90,8 @@ if __name__ == "__main__":
         ifcw = InputFromConsoleWorker(cp, cc)
         bwc.add(ifcw)
 
-        cc.addCommands(ConsoleToChatSender(cp, bp, csqs, icmp).getConsoleCommands())
+        cc.addCommands(ConsoleToBotSender(cp, bp, icmp, cprovide).getConsoleCommands())
+        cc.addCommands(ConsoleToChatSender(cp, csqs, ocmf).getConsoleCommands())
 
         cprovide.addObserver(SwitchableParrot(cp, csqs, ocmf))
         cprovide.addObserver(Recorder(csqs, ocmf, cp))

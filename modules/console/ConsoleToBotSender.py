@@ -1,6 +1,6 @@
 from chat.ChatMessage import ChatMessage
+from chat.ChatProvider import ChatProvider
 from chat.IncomingChatMessageProcessor import IncomingChatMessageProcessor
-from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.Command import Command, CommandArg
 from modules.base.CommandProvider import CommandProvider
 from utils.BotProperites import BotProperties
@@ -8,17 +8,18 @@ from utils.ConsoleProvider import ConsoleProvider
 from utils.Utils import addBotInputPrefix
 
 
-class ConsoleToChatSender(CommandProvider):
+class ConsoleToBotSender(CommandProvider):
     cp: ConsoleProvider
     bp: BotProperties
-    csqs: ChatSenderQuerySender
     icmp: IncomingChatMessageProcessor
+    cprovide: ChatProvider
 
-    def __init__(self, cp: ConsoleProvider, bp: BotProperties, csqs: ChatSenderQuerySender, icmp: IncomingChatMessageProcessor):
+    def __init__(self, cp: ConsoleProvider, bp: BotProperties, icmp: IncomingChatMessageProcessor,
+                 cprovide: ChatProvider):
         self.cp = cp
         self.bp = bp
-        self.csqs = csqs
         self.icmp = icmp
+        self.cprovide = cprovide
 
     def getConsoleCommands(self) -> list[Command]:
 
@@ -27,9 +28,9 @@ class ConsoleToChatSender(CommandProvider):
             CommandArg("body"),
         ]
 
-        return [Command("chat", self.sendMessageFromConsoleToChat, optionalArgs=optionalArgs)]
+        return [Command("fakemsg", self.sendMessageFromConsoleToBot, optionalArgs=optionalArgs)]
 
-    def sendMessageFromConsoleToChat(self, msg: ChatMessage, args: list[str]) -> None:
+    def sendMessageFromConsoleToBot(self, msg: ChatMessage, args: list[str]) -> None:
         newMsg: ChatMessage
         if len(args) == 0:
             newMsg = self.cp.runInConsoleLockWithResult(self.__inputMessage)
@@ -39,7 +40,7 @@ class ConsoleToChatSender(CommandProvider):
             self.cp.print(addBotInputPrefix("Wrong number of args, expected 0 or 2 - sender and body"))
             return
         self.icmp.process(newMsg)
-        self.csqs.addMessages([newMsg])
+        self.cprovide.cleanAndAddMultipleMessages([newMsg])
 
     def __inputMessage(self) -> ChatMessage:
         sender = input(addBotInputPrefix("Send as: "))
