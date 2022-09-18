@@ -3,7 +3,7 @@ from typing import Callable, Optional
 from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
 from chat.SelfAwareChatObserver import SelfAwareChatObserver
-from modules.base.Command import Command, CommandArg
+from modules.base.Command import Command, ARGS_DICT, CHAT_MESSAGE_KEY
 from modules.commands.CommandParser import CommandParser
 from properties import COMMAND_PREFIX
 from utils.ConsoleProvider import ConsoleProvider
@@ -54,21 +54,35 @@ class CommandDrivenModule(SelfAwareChatObserver):
 
         if command in self.commands:
             currentCommand = self.commands[command]
-            if len(args) > len(currentCommand.args + currentCommand.optionalArgs):
+            argLenCheck = currentCommand.checkArgsLength(args)
+            if argLenCheck > 0:
                 self.onError(command, msg.sender, args, "Length of args is more than args len for command")
-            elif len(args) < len(currentCommand.args):
+                return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
+            elif argLenCheck < 0:
                 self.onError(command, msg.sender, args, "Length of args is lesser than args len for command")
+                return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
+
+            argsDict: ARGS_DICT = currentCommand.createArgsDict(args)
+            argsDict[CHAT_MESSAGE_KEY] = msg
+
+            validateErrors: list[str] = self.__getArgsValidateErrors(currentCommand, argsDict)
+            if len(validateErrors) == 0:
+                currentCommand.action(argsDict)
             else:
-                validateErrors: list[str] = \
-                    self.__getArgsValidateErrors(msg, currentCommand.args + currentCommand.optionalArgs, args)
-                if len(validateErrors) == 0:
-                    currentCommand.action(msg, args)
-                else:
-                    self.onError(command, msg.sender, args, "There was at least one problem with args validation: {}"
-                                 .format(validateErrors))
+                self.onError(command, msg.sender, args, "There was at least one problem with args validation: {}"
+                             .format(validateErrors))
+
         elif self.acceptNonCommandInputWithPrefix and self.actionOnNonCommandInput is not None:
             self.actionOnNonCommandInput(msg)
         return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
+
+    @staticmethod
+    def __checkArgsLength(command: Command, args: list[str]) -> int:
+        if len(args) > len(command.args + command.optionalArgs):
+            return 1
+        elif len(args) < len(command.args):
+            return -1
+        return 0
 
     def onError(self, command: str, msgSender: str, args: list[str], reason: str) -> None:
         self.cp.print("Ошибка в команде '{}', отправитель = '{}', арг-ы = '{}', причина = '{}'"
@@ -76,14 +90,12 @@ class CommandDrivenModule(SelfAwareChatObserver):
         if self.actionOnCommandError is not None:
             self.actionOnCommandError(command, msgSender, args, reason)
 
-    def __getArgsValidateErrors(self, msg: ChatMessage,
-                                commandArgs: list[CommandArg],
-                                actualArgs: list[str]) -> list[str]:
+    @staticmethod
+    def __getArgsValidateErrors(command: Command, args: ARGS_DICT) -> list[str]:
         errors = []
 
-        for comArg, actualArg in zip(commandArgs, actualArgs):
-            if comArg.predicate is not None:
-                if not comArg.predicate.validate(actualArg, msg, actualArgs):
-                    errors.append(comArg.predicate.getValidationErrorText(actualArg, msg, actualArgs))
+        for validator in command.validators:
+            if not validator.validate(args):
+                errors.append(validator.getValidationErrorText(args))
 
         return errors

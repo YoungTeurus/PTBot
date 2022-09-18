@@ -3,7 +3,7 @@
 DEFAULT_LOG_BOT_NICKNAME = "BOT"
 
 # При установке в True включается Offline мод с работой бота без подключения к игре
-LOCAL_MODE = False
+LOCAL_MODE = True
 
 LOGIN_SETTINGS: dict[str, str] = {
     "remember_me": "iY%2ForMChgfT2quB3cSPLH0sQxrpgJH2AZxwubKQCkM9iYhMhnbOe%2B5dhZXSiw5P9uHay1JnXaOZOfBAyW8vZ0g%3D%3D%7CX4n8llUY6pxq9pOZ5%2FcfsGXZ71ciUo4f96tH2VR%2BD0cESz4%2BL6xmQrf%2BbtvF%2FihzmGfmhj2W01QV45bcAfMMlw%3D%3D",

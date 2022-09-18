@@ -1,7 +1,7 @@
 from chat.ChatMessage import ChatMessage
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from modules.base.Command import Command, CommandArg
+from modules.base.Command import Command, CommandArg, ARGS_DICT
 from modules.base.CommandProvider import CommandProvider
 from utils.ConsoleProvider import ConsoleProvider
 from utils.Utils import addBotInputPrefix
@@ -24,15 +24,12 @@ class ConsoleToChatSender(CommandProvider):
 
         return [Command("send", self.sendMessageFromConsoleToChat, optionalArgs=optionalArgs)]
 
-    def sendMessageFromConsoleToChat(self, msg: ChatMessage, args: list[str]) -> None:
+    def sendMessageFromConsoleToChat(self, args: ARGS_DICT) -> None:
         newMsg: ChatMessage
-        if len(args) == 0:
+        if "body" not in args:
             newMsg = self.cp.runInConsoleLockWithResult(self.__inputMessage)
         elif len(args) == 1:
-            newMsg = self.ocmf.globalMsg(args[0])
-        else:
-            self.cp.print(addBotInputPrefix("Wrong number of args, expected 0 or 1 - sender and body"))
-            return
+            newMsg = self.ocmf.globalMsg(args["body"])
 
         self.csqs.addMessage(newMsg)
 

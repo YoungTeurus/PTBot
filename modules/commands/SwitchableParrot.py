@@ -2,7 +2,7 @@ from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from modules.base.Command import CommandArg
+from modules.base.Command import CommandArg, ARGS_DICT, CHAT_MESSAGE_KEY
 from modules.base.CommandDrivenModule import Command
 from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
 from utils.ConsoleProvider import ConsoleProvider
@@ -30,12 +30,13 @@ class SwitchableParrot(OutputtingCommandDrivenModule):
 
         self.addCommand(Command("попуг", self.doSwitch, optionalArgs=optionalArgs))
 
-    def doSwitch(self, msg: ChatMessage, args: list[str]) -> None:
+    def doSwitch(self, args: ARGS_DICT) -> None:
+        msg: ChatMessage = args[CHAT_MESSAGE_KEY]
         if msg.type.isSentByBotAdmin:
-            if len(args) == 0:
+            if "newState" not in args:
                 self.switch()
             else:
-                newState = args[0]
+                newState: str = args["newState"]
                 if newState in self.argsToCallback:
                     self.argsToCallback[newState]()
         else:

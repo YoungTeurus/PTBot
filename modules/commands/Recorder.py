@@ -2,6 +2,7 @@ from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
+from modules.base.Command import ARGS_DICT, CHAT_MESSAGE_KEY
 from modules.base.CommandDrivenModule import Command
 from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
 from utils.ConsoleProvider import ConsoleProvider
@@ -26,7 +27,8 @@ class Recorder(OutputtingCommandDrivenModule):
         self.addCommand(startCommand)
         self.addCommand(stopCommand)
 
-    def startLogging(self, msg: ChatMessage, args: list[str]) -> None:
+    def startLogging(self, args: ARGS_DICT) -> None:
+        msg: ChatMessage = args[CHAT_MESSAGE_KEY]
         if msg.type.isSentByBot:
             return
         msgSender = msg.sender
@@ -38,7 +40,8 @@ class Recorder(OutputtingCommandDrivenModule):
         self.csqs.addGlobalMessage(
             "Слушаю сообщения от '{}', напишите '!stop' для остановки...".format(msgSender), self.ocmf)
 
-    def stopLogging(self, msg: ChatMessage, args: list[str]) -> None:
+    def stopLogging(self, args: ARGS_DICT) -> None:
+        msg: ChatMessage = args[CHAT_MESSAGE_KEY]
         if msg.type.isSentByBot:
             return
         msgSender = msg.sender
@@ -55,8 +58,8 @@ class Recorder(OutputtingCommandDrivenModule):
         else:
             self.csqs.addGlobalMessage("Повторяю все сообщения от '{}' в количестве {} штук(-и)..."
                                        .format(msgSender, msgCount), self.ocmf)
-            for msg in savedMessages:
-                self.csqs.addGlobalMessage(msg, self.ocmf)
+            for savedMsg in savedMessages:
+                self.csqs.addGlobalMessage(savedMsg, self.ocmf)
         self.history.pop(msgSender)
 
     def saveMessage(self, msg: ChatMessage) -> NotifyAction:

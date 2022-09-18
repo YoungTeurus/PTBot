@@ -1,6 +1,7 @@
 from chat.ChatMessage import ChatMessage
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
+from modules.base.Command import CHAT_MESSAGE_KEY, ARGS_DICT
 from modules.base.CommandDrivenModule import Command, CommandArg
 from modules.base.CommandProvider import CommandProvider
 from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
@@ -31,20 +32,22 @@ class AddAdminCommandModule(OutputtingCommandDrivenModule, CommandProvider):
 
         return commands
 
-    def noChatAddOp(self, msg: ChatMessage, args: list[str]) -> None:
-        newAdminNick = args[0]
+    def noChatAddOp(self, args: ARGS_DICT) -> None:
+        newAdminNick = args["nick"]
         self.cp.print("Adding '{}' as bot admin...".format(newAdminNick))
         self.bp.admins.append(newAdminNick)
 
-    def addOp(self, msg: ChatMessage, args: list[str]) -> None:
+    def addOp(self, args: ARGS_DICT) -> None:
+        msg: ChatMessage = args[CHAT_MESSAGE_KEY]
         if not msg.type.isSentByBotAdmin:
             self.cp.print("User '{}' tried to add new admin but was not admin".format(msg.sender))
             return
         newAdminNick: str
-        if len(args) == 0:
+        if "nick" not in args:
             newAdminNick = msg.sender
         else:
-            newAdminNick = args[0]
+            newAdminNick = args["nick"]
         self.cp.print("Adding '{}' as bot admin...".format(newAdminNick))
-        self.csqs.addWhisperMessage("Для '{}' установлен статус администратора".format(newAdminNick), msg.sender, self.ocmf)
+        self.csqs.addWhisperMessage("Для '{}' установлен статус администратора".format(newAdminNick), msg.sender,
+                                    self.ocmf)
         self.bp.admins.append(newAdminNick)

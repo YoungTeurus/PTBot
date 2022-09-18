@@ -1,7 +1,7 @@
 from chat.ChatMessage import ChatMessage
 from chat.ChatProvider import ChatProvider
 from chat.IncomingChatMessageProcessor import IncomingChatMessageProcessor
-from modules.base.Command import Command, CommandArg
+from modules.base.Command import Command, CommandArg, ARGS_DICT
 from modules.base.CommandProvider import CommandProvider
 from utils.BotProperites import BotProperties
 from utils.ConsoleProvider import ConsoleProvider
@@ -30,12 +30,12 @@ class ConsoleToBotSender(CommandProvider):
 
         return [Command("fakemsg", self.sendMessageFromConsoleToBot, optionalArgs=optionalArgs)]
 
-    def sendMessageFromConsoleToBot(self, msg: ChatMessage, args: list[str]) -> None:
+    def sendMessageFromConsoleToBot(self, args: ARGS_DICT) -> None:
         newMsg: ChatMessage
         if len(args) == 0:
             newMsg = self.cp.runInConsoleLockWithResult(self.__inputMessage)
         elif len(args) == 2:
-            newMsg = self.__createMessage(args[0], args[1]).build()
+            newMsg = self.__createMessage(args["sender"], args["body"]).build()
         else:
             self.cp.print(addBotInputPrefix("Wrong number of args, expected 0 or 2 - sender and body"))
             return

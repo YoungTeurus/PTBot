@@ -1,6 +1,6 @@
-from chat.ChatMessage import ChatMessage
 from chat.GameChatSenderQuerySender import GameChatSenderQuerySender
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
+from modules.base.Command import ARGS_DICT
 from modules.base.CommandDrivenModule import CommandDrivenModule, Command, CommandArg
 from utils.ConsoleProvider import ConsoleProvider
 
@@ -22,8 +22,7 @@ class TestCommandModule(CommandDrivenModule):
 
         self.addCommand(command)
 
-    def sayFirstArg(self, msg: ChatMessage, args: list[str]) -> None:
-        textToSay = args[0]
+    def sayFirstArg(self, args: ARGS_DICT) -> None:
+        textToSay: str = args["text"]
         self.cp.print("Command 'test' with argument '{}'".format(textToSay))
         self.csqs.addGlobalMessage("Повторяю: '{}'".format(textToSay), self.ocmf)
-
