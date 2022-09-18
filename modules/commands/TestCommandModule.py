@@ -8,13 +8,11 @@ from utils.ConsoleProvider import ConsoleProvider
 class TestCommandModule(CommandDrivenModule):
     csqs: GameChatSenderQuerySender
     ocmf: OutgoingChatMessageFactory
-    cp: ConsoleProvider
 
     def __init__(self, csqs: GameChatSenderQuerySender, ocmf: OutgoingChatMessageFactory, cp: ConsoleProvider):
         super().__init__(cp)
         self.csqs = csqs
         self.ocmf = ocmf
-        self.cp = cp
 
         args = [
             ChatCommandArg("text")

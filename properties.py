@@ -2,8 +2,8 @@
 # Одновременно является ником бота для LOCAL_MODE!
 DEFAULT_LOG_BOT_NICKNAME = "BOT"
 
-# Set to True to disable logging in game
-LOCAL_MODE = False
+# При установке в True включается Offline мод с работой бота без подключения к игре
+LOCAL_MODE = True
 
 LOGIN_SETTINGS: dict[str, str] = {
     "remember_me": "80YA33jPU4uq4ToixAJ2u8kBlztqpL7eQIKdBiz9t1LpPX78dQVcwoUJ9xRBdoBkkPvrLeMmhTa%2FVDVgrzjqnw%3D%3D%7C5lyr8VE0sDCEFV6543sELwurfBKvCqZANuuUKHUkhYFN1xCnqQJN%2FLwnxWHnn9Zoujxyft20OYty0n9zD4ekvQ%3D%3D",
@@ -43,10 +43,17 @@ class ACTIVITY_WORKER:
     secsBetweenUpdates: float = 5
 
 
+# Определяет символ(-ы), необходимые для установки перед сообщением, чтобы бот распознал в них команду.
 COMMAND_PREFIX = "!"
+
+
 SELF_IDENTIFY_MESSAGE_LENGTH = 10
 
 
 class LOGGING:
     logWorkers: bool = False
     logUpdatingActivities: bool = False
+
+
+class ArgsDevider:
+    quotationMark: str = '"'

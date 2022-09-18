@@ -15,9 +15,9 @@ from driver.DriverInitializer import DriverInitializer
 from driver.ElementManipulator import ElementManipulator
 from driver.LocalStorage import LocalStorage
 from modules.ChatToConsoleLogger import ChatToConsoleLogger
-from modules.Parrot import Parrot
 from modules.SelfIdentify import SelfIdentify
-from modules.TestCommandWithHistoryModule import TestCommandWithHistoryModule
+from modules.commands.AddAdminCommandModule import AddAdminCommandModule
+from modules.commands.Recorder import Recorder
 from properties import LOCAL_MODE
 from utils.BotProperites import BotProperties, BotState
 from utils.ConsoleProvider import ConsoleProvider
@@ -81,10 +81,11 @@ if __name__ == "__main__":
 
     def loadCustomModules() -> None:
         cp.print("Loading custom modules (observers)...")
-        bwc.add(InputFromConsoleWorker(cprovide, cp, bp))
+        bwc.add(InputFromConsoleWorker(cprovide, cp, bp, csqs))
 
-        cprovide.addObserver(Parrot(csqs, ocmf))
-        cprovide.addObserver(TestCommandWithHistoryModule(csqs, ocmf, cp))
+        # cprovide.addObserver(Parrot(csqs, ocmf))
+        cprovide.addObserver(Recorder(csqs, ocmf, cp))
+        cprovide.addObserver(AddAdminCommandModule(csqs, ocmf, cp, bp))
         cp.print("Finished loading custom modules!")
 
 

@@ -2,6 +2,7 @@ from typing import Callable
 
 from chat.ChatMessage import ChatMessage
 from chat.ChatProvider import ChatProvider
+from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from utils.BotProperites import BotProperties
 from utils.ConsoleProvider import ConsoleProvider
 from workers.interfaces.BaseBotWorker import BaseBotWorker
@@ -50,14 +51,16 @@ class InputFromConsoleWorker(WorkLockingBaseBotWorker):
     msgToReceive: list[ChatMessage]
     test: ConsoleInputConsumer
     bp: BotProperties
+    csqs: ChatSenderQuerySender
 
-    def __init__(self, cprovide: ChatProvider, cp: ConsoleProvider, bp: BotProperties):
+    def __init__(self, cprovide: ChatProvider, cp: ConsoleProvider, bp: BotProperties, csqs: ChatSenderQuerySender):
         super().__init__(cp)
 
         self.cprovide = cprovide
         self.msgToReceive = []
         self.cp = cp
         self.bp = bp
+        self.csqs = csqs
 
     def postInit(self) -> None:
         self.test = ConsoleInputConsumer(self.cp, self.bp, self.onNewInput)
@@ -68,7 +71,8 @@ class InputFromConsoleWorker(WorkLockingBaseBotWorker):
         self.msgToReceive.append(msg)
 
     def doWork(self) -> None:
-        self.cprovide.cleanAndAddMultipleMessages(self.msgToReceive)
+        # self.cprovide.cleanAndAddMultipleMessages(self.msgToReceive)
+        self.csqs.addMessages(self.msgToReceive)
         self.msgToReceive.clear()
 
     def hasWork(self) -> bool:

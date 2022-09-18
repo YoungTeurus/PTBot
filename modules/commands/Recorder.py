@@ -1,23 +1,22 @@
 from chat.ChatMessage import ChatMessage
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from modules.base.CommandDrivenModule import CommandDrivenModule, ChatCommand
+from modules.base.CommandDrivenModule import ChatCommand
+from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
 from utils.ConsoleProvider import ConsoleProvider
 
 
-class TestCommandWithHistoryModule(CommandDrivenModule):
-    csqs: ChatSenderQuerySender
-    ocmf: OutgoingChatMessageFactory
-
+class Recorder(OutputtingCommandDrivenModule):
+    """
+    Позволяет записывать сообщения игроков и воспроизводить их.
+    """
     # player_name => msgs
     history: dict[str, list[str]]
 
     def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory, cp: ConsoleProvider):
-        super().__init__(cp, actionOnCommandError=self.sendErrorToChat,
+        super().__init__(cp, csqs, ocmf,
                          actionOnNonCommandInput=self.saveMessage,
                          asseptNonCommandInputWithPrefix=True)
-        self.csqs = csqs
-        self.ocmf = ocmf
         self.history = {}
 
         startCommand: ChatCommand = ChatCommand("start", self.startLogging)
@@ -25,10 +24,6 @@ class TestCommandWithHistoryModule(CommandDrivenModule):
 
         self.addCommand(startCommand)
         self.addCommand(stopCommand)
-
-    def sendErrorToChat(self, command: str, msgSender: str, args: list[str], reason: str) -> None:
-        self.csqs.addGlobalMessage("Error! command = {}, msgSender = {}, args = {}, reason = {}"
-                                   .format(command, msgSender, args, reason), self.ocmf)
 
     def startLogging(self, msg: ChatMessage, args: list[str]) -> None:
         if msg.type.isSentByBot:
