@@ -97,3 +97,9 @@ if __name__ == "__main__":
         pass
 
     loadCustomModules()
+
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        bwc.stopAll()

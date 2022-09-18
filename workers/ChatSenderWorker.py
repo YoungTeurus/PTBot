@@ -3,7 +3,7 @@ from time import time
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from properties import CHAT_SENDER_WORKER
 from utils.ConsoleProvider import ConsoleProvider
-from workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
+from workers.base.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 
 
 class ChatSenderWorker(WorkLockingBaseBotWorker):

@@ -51,7 +51,7 @@ SELF_IDENTIFY_MESSAGE_LENGTH = 10
 
 
 class LOGGING:
-    logWorkers: bool = False
+    logWorkers: bool = True
     logUpdatingActivities: bool = False
 
 

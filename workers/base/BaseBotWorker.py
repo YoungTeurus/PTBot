@@ -11,7 +11,7 @@ class BaseBotWorker(Thread):
 
     def __init__(self, cp: ConsoleProvider):
         super().__init__()
-        self.daemon = False
+        self.daemon = True
         self.running = False
         self.cp = cp
 
@@ -39,6 +39,8 @@ class BaseBotWorker(Thread):
             self.cp.print("Worker '{}' began to run".format(self))
         while self.running:
             self._doWhileRunning()
+        if LOGGING.logWorkers:
+            self.cp.print("Worker '{}' stopped".format(self))
 
     def hasWork(self) -> bool:
         return False
@@ -49,7 +51,8 @@ class BaseBotWorker(Thread):
     def doWork(self) -> None:
         pass
 
-    def interrupt(self):
+    def interrupt(self, timeout: float = 1):
         if LOGGING.logWorkers:
             self.cp.print("Worker '{}' is interrupted".format(self))
         self.running = False
+        self.join(timeout)

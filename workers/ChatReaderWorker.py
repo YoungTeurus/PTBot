@@ -9,7 +9,7 @@ from chat.ChatReader import ChatReader
 from chat.IncomingChatMessageProcessor import IncomingChatMessageProcessor
 from properties import CHAT_READER_WORKER
 from utils.ConsoleProvider import ConsoleProvider
-from workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
+from workers.base.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 
 
 class ChatReaderWorker(WorkLockingBaseBotWorker):

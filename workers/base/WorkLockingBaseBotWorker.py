@@ -1,4 +1,4 @@
-from workers.interfaces.BaseBotWorker import BaseBotWorker
+from workers.base.BaseBotWorker import BaseBotWorker
 
 
 class WorkLockingBaseBotWorker(BaseBotWorker):

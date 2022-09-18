@@ -2,7 +2,7 @@ from threading import Lock
 
 from properties import LOGGING
 from utils.ConsoleProvider import ConsoleProvider
-from workers.interfaces.BaseBotWorker import BaseBotWorker
+from workers.base.BaseBotWorker import BaseBotWorker
 
 
 class BotWorkersContainer:
@@ -22,6 +22,10 @@ class BotWorkersContainer:
                 self.cp.print("Worker '{}' was added".format(worker))
             worker.prepare(self.lock)
 
-    def stopAll(self) -> None:
+    def stopAll(self, timeout: float = None) -> None:
+        if LOGGING.logWorkers:
+            self.cp.print("Stopping all workers...")
         for worker in self.workers:
-            worker.interrupt()
+            worker.interrupt(timeout)
+        if LOGGING.logWorkers:
+            self.cp.print("All workers were stopped...")

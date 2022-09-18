@@ -3,7 +3,7 @@ from time import time
 from activities.ActivityContainer import ActivityContainer
 from properties import ACTIVITY_WORKER, LOGGING
 from utils.ConsoleProvider import ConsoleProvider
-from workers.interfaces.NonLockingBaseBotWorker import NonLockingBaseBotWorker
+from workers.base.NonLockingBaseBotWorker import NonLockingBaseBotWorker
 
 
 class ActivityWorker(NonLockingBaseBotWorker):

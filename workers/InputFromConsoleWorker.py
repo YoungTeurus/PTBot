@@ -5,8 +5,9 @@ from chat.ChatProvider import ChatProvider
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from utils.BotProperites import BotProperties
 from utils.ConsoleProvider import ConsoleProvider
-from workers.interfaces.BaseBotWorker import BaseBotWorker
-from workers.interfaces.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
+from utils.TimedInput import input_with_timeout, TimeoutExpired
+from workers.base.BaseBotWorker import BaseBotWorker
+from workers.base.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 
 CHAT_MESSAGE_CONSUMER = Callable[[ChatMessage], None]
 
@@ -24,10 +25,13 @@ class ConsoleInputConsumer(BaseBotWorker):
         self.inputConsumer = chatMessageConsumer
 
     def _doWhileRunning(self) -> None:
-        i = input()
-        if len(i) > 0:
-            msg = self.cp.runInConsoleLockWithResult(self.__inputMessage)
-            self.inputConsumer(msg)
+        try:
+            i = input_with_timeout(timeout=1)
+            if len(i) > 0:
+                msg = self.cp.runInConsoleLockWithResult(self.__inputMessage)
+                self.inputConsumer(msg)
+        except TimeoutExpired:
+            pass
 
     def __inputMessage(self) -> ChatMessage:
         msg = input("Input message: ")
@@ -78,7 +82,7 @@ class InputFromConsoleWorker(WorkLockingBaseBotWorker):
     def hasWork(self) -> bool:
         return len(self.msgToReceive) > 0
 
-    def interrupt(self):
-        super().interrupt()
+    def interrupt(self, timeout: float = 1):
+        super().interrupt(timeout)
         if self.test is not None:
-            self.test.interrupt()
+            self.test.interrupt(timeout)
