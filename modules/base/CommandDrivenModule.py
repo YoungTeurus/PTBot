@@ -3,69 +3,15 @@ from typing import Callable, Optional
 from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
 from chat.SelfAwareChatObserver import SelfAwareChatObserver
+from modules.base.Command import Command, CommandArg
+from modules.commands.CommandParser import CommandParser
 from properties import COMMAND_PREFIX
-from utils.ArgsDevider import splitArgs
 from utils.ConsoleProvider import ConsoleProvider
 
-# (args) => None
-ACTION_CALLBACK = Callable[[ChatMessage, list[str]], None]
-# (command, msg.sender, args, reason) => None
+# (name, msg.sender, args, reason) => None
 ACTION_ON_COMMAND_ERROR_HANDLER = Callable[[str, str, list[str], str], None]
 # (msg) => action
 NON_COMMAND_MSG_HANDLER = Callable[[ChatMessage], NotifyAction]
-
-
-class ChatCommandArgPredicate:
-    """
-    Предикат для команды чата - валидирует один аргумент чата, имея доступ ко всему сообщению и другим аргументам.
-    """
-
-    def validate(self, arg: str, msg: ChatMessage, args: list[str]) -> bool:
-        """
-        Валидирует аргумент команды.
-        :param arg: Валидируемый аргумент
-        :param msg: Сообщение с командой
-        :param args: Все аргументы
-        :return: Результат валидации, True - пройдена, False - не пройдена и можно запросить текст ошибки с
-         помощью метода getValidationErrorText.
-        """
-        raise NotImplementedError
-
-    def getValidationErrorText(self, arg: str, msg: ChatMessage, args: list[str]) -> str:
-        raise NotImplementedError
-
-
-class ChatCommandArg:
-    """
-    Аргумент для команды чата.
-    Хранит своё название и предикат, который используется для проверки аргумента на валидность.
-    """
-    name: str
-    predicate: Optional[ChatCommandArgPredicate]
-
-    def __init__(self, name: str, predicate: ChatCommandArgPredicate = None):
-        self.name = name
-        self.predicate = predicate
-
-
-class ChatCommand:
-    """
-    Команда для чата. Услышав команду в чате бот выполнит действие.
-    Для команды могут передаваться как обязательные, так и необязательные аргументы.
-    Необязательные аргументы всегда следуют после обязательных.
-    Порядок аргументов задаётся порядком объектов в списке args и optionalArgs.
-    """
-    command: str
-    action: ACTION_CALLBACK
-    args: list[ChatCommandArg]
-    optionalArgs: list[ChatCommandArg]
-
-    def __init__(self, command: str, action: ACTION_CALLBACK,
-                 args: list[ChatCommandArg] = None, optionalArgs: list[ChatCommandArg] = None):
-        self.command = command
-        self.action = action
-        self.args = args if args is not None else []
-        self.optionalArgs = optionalArgs if optionalArgs is not None else []
 
 
 class CommandDrivenModule(SelfAwareChatObserver):
@@ -74,9 +20,9 @@ class CommandDrivenModule(SelfAwareChatObserver):
     выполнить какое-либо действие.
     """
     cp: ConsoleProvider
-    # command => ChatCommand
-    commands: dict[str, ChatCommand]
-    # (command, msg.sender, args, reason) => None
+    # name => Command
+    commands: dict[str, Command]
+    # (name, msg.sender, args, reason) => None
     actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER
     actionOnNonCommandInput: Optional[NON_COMMAND_MSG_HANDLER]
     acceptNonCommandInputWithPrefix: bool
@@ -90,11 +36,11 @@ class CommandDrivenModule(SelfAwareChatObserver):
         self.actionOnNonCommandInput = actionOnNonCommandInput
         self.acceptNonCommandInputWithPrefix = acceptNonCommandInputWithPrefix
 
-    def addCommand(self, chatCommand: ChatCommand):
-        self.commands[chatCommand.command] = chatCommand
+    def addCommand(self, chatCommand: Command):
+        self.commands[chatCommand.name] = chatCommand
 
-    def addCommandCheckIfExists(self, chatCommand: ChatCommand):
-        if chatCommand.command in self.commands:
+    def addCommandCheckIfExists(self, chatCommand: Command):
+        if chatCommand.name in self.commands:
             self.cp.print("Command '' was already in this module")
         self.addCommand(chatCommand)
 
@@ -103,7 +49,8 @@ class CommandDrivenModule(SelfAwareChatObserver):
             if self.actionOnNonCommandInput is not None:
                 return self.actionOnNonCommandInput(msg)
             return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
-        command, args = CommandDrivenModule.__getCommandAndArgs(msg.body)
+        bodyWithoutPrefix = msg.body[len(COMMAND_PREFIX):]
+        command, args = CommandParser.getCommandAndArgs(bodyWithoutPrefix)
 
         if command in self.commands:
             currentCommand = self.commands[command]
@@ -123,19 +70,6 @@ class CommandDrivenModule(SelfAwareChatObserver):
             self.actionOnNonCommandInput(msg)
         return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
 
-    @staticmethod
-    def __getCommandAndArgs(msgBody: str) -> tuple[str, list[str]]:
-        """
-        Разделяет текст сообщения на саму команду и список аргументов.
-        :param msgBody: Текст сообщения
-        :return: Tuple, первый элемент - команда, второй элемент - список аргументов
-        """
-        msgWithoutPrefix = msgBody[len(COMMAND_PREFIX):]
-        commandAndArgs = splitArgs(msgWithoutPrefix)
-        command = commandAndArgs[0]
-        args = commandAndArgs[1:]
-        return command, args
-
     def onError(self, command: str, msgSender: str, args: list[str], reason: str) -> None:
         self.cp.print("Ошибка в команде '{}', отправитель = '{}', арг-ы = '{}', причина = '{}'"
                       .format(command, msgSender, args, reason))
@@ -143,7 +77,7 @@ class CommandDrivenModule(SelfAwareChatObserver):
             self.actionOnCommandError(command, msgSender, args, reason)
 
     def __getArgsValidateErrors(self, msg: ChatMessage,
-                                commandArgs: list[ChatCommandArg],
+                                commandArgs: list[CommandArg],
                                 actualArgs: list[str]) -> list[str]:
         errors = []
 

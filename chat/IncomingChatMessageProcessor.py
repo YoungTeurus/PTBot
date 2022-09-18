@@ -9,9 +9,10 @@ class IncomingChatMessageProcessor:
         self.botProperties = botProperties
 
     def process(self, msg: ChatMessage) -> None:
-        self.checkMessageOnBotName(msg)
+        self.__checkMessageOnBotName(msg)
+        self.__checkMessageOnAdminSender(msg)
 
-    def checkMessageOnBotName(self, msg):
+    def __checkMessageOnBotName(self, msg: ChatMessage) -> None:
         botName = self.botProperties.botName
         if botName is not None:
             if msg.type.isSentByBot:
@@ -20,3 +21,7 @@ class IncomingChatMessageProcessor:
                 msg.type.isSentByBot = True
             elif msg.type.isSentToBot:
                 msg.receiver = botName
+
+    def __checkMessageOnAdminSender(self, msg: ChatMessage) -> None:
+        if msg.sender in self.botProperties.admins:
+            msg.type.isSentByBotAdmin = True

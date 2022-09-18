@@ -51,8 +51,8 @@ class BaseBotWorker(Thread):
     def doWork(self) -> None:
         pass
 
-    def interrupt(self, timeout: float = 1):
+    def interrupt(self):
         if LOGGING.logWorkers:
             self.cp.print("Worker '{}' is interrupted".format(self))
         self.running = False
-        self.join(timeout)
+        self.join()

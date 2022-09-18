@@ -30,3 +30,6 @@ class GameChatSenderQuerySender(ChatSenderQuerySender):
 
     def hasMsgs(self) -> bool:
         return len(self.__sendQuery) > 0
+
+    def cleanMsgQueue(self) -> None:
+        self.__sendQuery.clear()

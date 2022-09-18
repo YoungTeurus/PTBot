@@ -1,88 +1,58 @@
-from typing import Callable
-
-from chat.ChatMessage import ChatMessage
-from chat.ChatProvider import ChatProvider
-from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from utils.BotProperites import BotProperties
+from modules.commands.CommandParser import CommandParser
+from modules.console.CommandController import CommandController
 from utils.ConsoleProvider import ConsoleProvider
 from utils.TimedInput import input_with_timeout, TimeoutExpired
+from utils.Utils import STRING_CONSUMER, addBotInputPrefix
 from workers.base.BaseBotWorker import BaseBotWorker
 from workers.base.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
-
-CHAT_MESSAGE_CONSUMER = Callable[[ChatMessage], None]
 
 
 class ConsoleInputConsumer(BaseBotWorker):
     """
     Воркер ожидает сообщения в консоли и пересылает их в метод, который был передан ему при инициализации.
     """
-    bp: BotProperties
-    inputConsumer: CHAT_MESSAGE_CONSUMER
+    inputConsumer: STRING_CONSUMER
 
-    def __init__(self, cp: ConsoleProvider, bp: BotProperties, chatMessageConsumer: CHAT_MESSAGE_CONSUMER):
+    def __init__(self, cp: ConsoleProvider, inputConsumer: STRING_CONSUMER):
         super().__init__(cp)
-        self.bp = bp
-        self.inputConsumer = chatMessageConsumer
+        self.inputConsumer = inputConsumer
 
     def _doWhileRunning(self) -> None:
         try:
             i = input_with_timeout(timeout=1)
             if len(i) > 0:
-                msg = self.cp.runInConsoleLockWithResult(self.__inputMessage)
-                self.inputConsumer(msg)
+                command = self.cp.runInConsoleLockWithResult(self.__inputCommand)
+                if len(command.strip()) > 0:
+                    self.inputConsumer(command)
+                else:
+                    self.cp.print(addBotInputPrefix("No command found"))
         except TimeoutExpired:
             pass
 
-    def __inputMessage(self) -> ChatMessage:
-        msg = input("Input message: ")
-        sender = input("Send as: ")
-        toWhisper = input("Send to bot as whisper? (y - yes) ")
-
-        builder = ChatMessage.Builder()
-
-        builder.body = msg
-        builder.sender = sender
-        if toWhisper == "y":
-            builder.type.isWhisper = True
-            builder.type.isSentToBot = True
-            builder.receiver = self.bp.botName
-
-        return builder.build()
+    @staticmethod
+    def __inputCommand() -> str:
+        return input(addBotInputPrefix("Input command: "))
 
 
 class InputFromConsoleWorker(WorkLockingBaseBotWorker):
-    cprovide: ChatProvider
-    msgToReceive: list[ChatMessage]
-    test: ConsoleInputConsumer
-    bp: BotProperties
-    csqs: ChatSenderQuerySender
+    cic: ConsoleInputConsumer
+    cc: CommandController
 
-    def __init__(self, cprovide: ChatProvider, cp: ConsoleProvider, bp: BotProperties, csqs: ChatSenderQuerySender):
+    def __init__(self, cp: ConsoleProvider, cc: CommandController):
         super().__init__(cp)
-
-        self.cprovide = cprovide
-        self.msgToReceive = []
         self.cp = cp
-        self.bp = bp
-        self.csqs = csqs
+        self.cc = cc
 
     def postInit(self) -> None:
-        self.test = ConsoleInputConsumer(self.cp, self.bp, self.onNewInput)
+        self.cic = ConsoleInputConsumer(self.cp, self.onNewInput)
         # noinspection PyTypeChecker
-        self.test.prepare(None)
+        self.cic.prepare(None)
 
-    def onNewInput(self, msg: ChatMessage) -> None:
-        self.msgToReceive.append(msg)
+    def onNewInput(self, input: str) -> None:
+        command, args = CommandParser.getCommandAndArgs(input)
+        self.cc.executeCommand(command, args)
 
-    def doWork(self) -> None:
-        # self.cprovide.cleanAndAddMultipleMessages(self.msgToReceive)
-        self.csqs.addMessages(self.msgToReceive)
-        self.msgToReceive.clear()
-
-    def hasWork(self) -> bool:
-        return len(self.msgToReceive) > 0
-
-    def interrupt(self, timeout: float = 1):
-        super().interrupt(timeout)
-        if self.test is not None:
-            self.test.interrupt(timeout)
+    def interrupt(self):
+        super().interrupt()
+        if self.cic is not None:
+            self.cic.interrupt()

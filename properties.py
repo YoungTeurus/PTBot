@@ -51,9 +51,12 @@ SELF_IDENTIFY_MESSAGE_LENGTH = 10
 
 
 class LOGGING:
-    logWorkers: bool = True
+    logWorkers: bool = False
     logUpdatingActivities: bool = False
 
 
 class ArgsDevider:
     quotationMark: str = '"'
+
+
+BOT_INPUT_PREFIX = "BOT << "

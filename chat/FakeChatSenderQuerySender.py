@@ -18,3 +18,6 @@ class FakeChatSenderQuerySender(ChatSenderQuerySender):
 
     def hasMsgs(self) -> bool:
         return False
+
+    def cleanMsgQueue(self) -> None:
+        pass

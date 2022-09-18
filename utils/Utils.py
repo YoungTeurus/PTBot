@@ -2,6 +2,8 @@ from typing import Callable, TypeVar
 
 from selenium.webdriver.remote.webelement import WebElement
 
+from properties import BOT_INPUT_PREFIX
+
 T = TypeVar('T')
 
 CALLBACK_FUNCTION = Callable[[], None]
@@ -21,3 +23,7 @@ def runtimeErrorSupplier(msg: str) -> CALLBACK_FUNCTION:
         raise RuntimeError(msg)
 
     return wrapper
+
+
+def addBotInputPrefix(output: str) -> str:
+    return BOT_INPUT_PREFIX + output

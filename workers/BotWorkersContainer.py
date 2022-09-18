@@ -22,10 +22,10 @@ class BotWorkersContainer:
                 self.cp.print("Worker '{}' was added".format(worker))
             worker.prepare(self.lock)
 
-    def stopAll(self, timeout: float = None) -> None:
+    def stopAll(self) -> None:
         if LOGGING.logWorkers:
             self.cp.print("Stopping all workers...")
         for worker in self.workers:
-            worker.interrupt(timeout)
+            worker.interrupt()
         if LOGGING.logWorkers:
             self.cp.print("All workers were stopped...")

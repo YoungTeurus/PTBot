@@ -15,10 +15,12 @@ from driver.DriverInitializer import DriverInitializer
 from driver.ElementManipulator import ElementManipulator
 from driver.LocalStorage import LocalStorage
 from modules.ChatToConsoleLogger import ChatToConsoleLogger
+from modules.ConsoleToChatSender import ConsoleToChatSender
 from modules.SelfIdentify import SelfIdentify
 from modules.commands.AddAdminCommandModule import AddAdminCommandModule
 from modules.commands.Recorder import Recorder
 from modules.commands.SwitchableParrot import SwitchableParrot
+from modules.console.CommandController import CommandController
 from properties import LOCAL_MODE
 from utils.BotProperites import BotProperties, BotState
 from utils.ConsoleProvider import ConsoleProvider
@@ -35,7 +37,7 @@ if __name__ == "__main__":
     cp.print("Starting bot...")
 
     bp = BotProperties()
-    cmp = IncomingChatMessageProcessor(bp)
+    icmp = IncomingChatMessageProcessor(bp)
 
     bwc = BotWorkersContainer(cp)
 
@@ -48,6 +50,8 @@ if __name__ == "__main__":
     ocmf = OutgoingChatMessageFactory(bp)
 
     csqs: ChatSenderQuerySender
+
+    cc = CommandController()
 
     if not LOCAL_MODE:
         driver: WebDriver = DriverInitializer.startFirefoxDriver()
@@ -67,7 +71,7 @@ if __name__ == "__main__":
         cs = GameChatSender(manipulator)
         csqs = GameChatSenderQuerySender(cs, cp)
 
-        bwc.add(ChatReaderWorker(cr, cparse, cprovide, cmp, cp))
+        bwc.add(ChatReaderWorker(cr, cparse, cprovide, icmp, cp))
         bwc.add(ChatSenderWorker(csqs, cp))
     else:
         cp.print("Running in local mode!")
@@ -82,11 +86,16 @@ if __name__ == "__main__":
 
     def loadCustomModules() -> None:
         cp.print("Loading custom modules (observers)...")
-        bwc.add(InputFromConsoleWorker(cprovide, cp, bp, csqs))
+        ifcw = InputFromConsoleWorker(cp, cc)
+        bwc.add(ifcw)
 
-        cprovide.addObserver(SwitchableParrot(cp, csqs, ocmf, bp))
+        cc.addCommands(ConsoleToChatSender(cp, bp, csqs, icmp).getConsoleCommands())
+
+        cprovide.addObserver(SwitchableParrot(cp, csqs, ocmf))
         cprovide.addObserver(Recorder(csqs, ocmf, cp))
-        cprovide.addObserver(AddAdminCommandModule(csqs, ocmf, cp, bp))
+        aacm = AddAdminCommandModule(csqs, ocmf, cp, bp)
+        cc.addCommands(aacm.getConsoleCommands())
+        cprovide.addObserver(aacm)
         cp.print("Finished loading custom modules!")
 
 

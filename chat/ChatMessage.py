@@ -14,6 +14,7 @@ class ChatMessageType:
     isAnnouncement: bool
     isSentByBot: bool
     isSentToBot: bool
+    isSentByBotAdmin: bool
 
     def __init__(self):
         self.isSystem = False
@@ -21,6 +22,7 @@ class ChatMessageType:
         self.isAnnouncement = False
         self.isSentByBot = False
         self.isSentToBot = False
+        self.isSentByBotAdmin = False
 
 
 class ChatMessage:
@@ -57,6 +59,8 @@ class ChatMessage:
             flags += "n"
 
         sender = self.sender if sender is None else sender
+        if self.type.isSentByBotAdmin:
+            sender = sender + "(ADMIN)"
         receiver = EVERYONE if self.receiver is None else self.receiver
 
         return "{} {} {} -> {}: {}".format(flags, self.timestamp.strftime("%H:%M"), sender, receiver, self.body)

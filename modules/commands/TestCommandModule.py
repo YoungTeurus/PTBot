@@ -1,7 +1,7 @@
 from chat.ChatMessage import ChatMessage
 from chat.GameChatSenderQuerySender import GameChatSenderQuerySender
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
-from modules.base.CommandDrivenModule import CommandDrivenModule, ChatCommand, ChatCommandArg
+from modules.base.CommandDrivenModule import CommandDrivenModule, Command, CommandArg
 from utils.ConsoleProvider import ConsoleProvider
 
 
@@ -15,10 +15,10 @@ class TestCommandModule(CommandDrivenModule):
         self.ocmf = ocmf
 
         args = [
-            ChatCommandArg("text")
+            CommandArg("text")
         ]
 
-        command: ChatCommand = ChatCommand("test", self.sayFirstArg, args)
+        command: Command = Command("test", self.sayFirstArg, args)
 
         self.addCommand(command)
 

@@ -31,6 +31,11 @@ class ChatSenderQuerySender:
     def hasMsgs(self) -> bool:
         """
         Возвращает True, если хотя бы одно сообщение находится в очереди на отправку.
-        :return:
+        """
+        raise NotImplementedError
+
+    def cleanMsgQueue(self) -> None:
+        """
+        Очищает очередь сообщений для отправки
         """
         raise NotImplementedError

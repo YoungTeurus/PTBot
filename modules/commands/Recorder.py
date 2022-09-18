@@ -2,7 +2,7 @@ from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from modules.base.CommandDrivenModule import ChatCommand
+from modules.base.CommandDrivenModule import Command
 from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
 from utils.ConsoleProvider import ConsoleProvider
 
@@ -20,8 +20,8 @@ class Recorder(OutputtingCommandDrivenModule):
                          acceptNonCommandInputWithPrefix=True)
         self.history = {}
 
-        startCommand: ChatCommand = ChatCommand("start", self.startLogging)
-        stopCommand: ChatCommand = ChatCommand("stop", self.stopLogging)
+        startCommand: Command = Command("start", self.startLogging)
+        stopCommand: Command = Command("stop", self.stopLogging)
 
         self.addCommand(startCommand)
         self.addCommand(stopCommand)
