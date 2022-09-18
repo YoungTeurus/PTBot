@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import Optional
 
+from properties import START_UP_ADMINS
+
 
 class BotState(Enum):
     STARTING = 1
@@ -14,4 +16,4 @@ class BotProperties:
     def __init__(self):
         self.botName = None
         self.state = BotState.STARTING
-        self.admins = []
+        self.admins = START_UP_ADMINS

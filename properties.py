@@ -3,11 +3,11 @@
 DEFAULT_LOG_BOT_NICKNAME = "BOT"
 
 # При установке в True включается Offline мод с работой бота без подключения к игре
-LOCAL_MODE = True
+LOCAL_MODE = False
 
 LOGIN_SETTINGS: dict[str, str] = {
-    "remember_me": "80YA33jPU4uq4ToixAJ2u8kBlztqpL7eQIKdBiz9t1LpPX78dQVcwoUJ9xRBdoBkkPvrLeMmhTa%2FVDVgrzjqnw%3D%3D%7C5lyr8VE0sDCEFV6543sELwurfBKvCqZANuuUKHUkhYFN1xCnqQJN%2FLwnxWHnn9Zoujxyft20OYty0n9zD4ekvQ%3D%3D",
-    "connect.sid": "s%3A_bN_fVJAFCyE5dZhdclNkNGsP5g6zx0I.fgfUzofQipWNbv%2FjwPC7bYABODwCa78JxWFkFzqzgvU"
+    "remember_me": "iY%2ForMChgfT2quB3cSPLH0sQxrpgJH2AZxwubKQCkM9iYhMhnbOe%2B5dhZXSiw5P9uHay1JnXaOZOfBAyW8vZ0g%3D%3D%7CX4n8llUY6pxq9pOZ5%2FcfsGXZ71ciUo4f96tH2VR%2BD0cESz4%2BL6xmQrf%2BbtvF%2FihzmGfmhj2W01QV45bcAfMMlw%3D%3D",
+    "connect.sid": "s%3AV5h5h1DLjhgTetmGEb3KOm4cnx6so_jp.HsJbiunBZnCfs0U3B2rwVaasTmx7%2F7q59BgY%2BWN%2FY1A"
 }
 
 WAIT_SETTINGS: dict[str, float] = {
@@ -60,3 +60,7 @@ class ArgsDevider:
 
 
 BOT_INPUT_PREFIX = "BOT << "
+
+# Список ников, по умолчанию добавляемых в админы.
+# НЕБЕЗОПАСНО!
+START_UP_ADMINS: list[str] = ["- Teurus [and Fyaf] -"]
