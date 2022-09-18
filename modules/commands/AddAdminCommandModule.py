@@ -22,13 +22,15 @@ class AddAdminCommandModule(OutputtingCommandDrivenModule):
         self.addCommand(command)
 
     def addOp(self, msg: ChatMessage, args: list[str]) -> None:
-        if msg.sender not in self.bp.admins:
-            self.cp.print("User '{}' tried to add new admin but was not admin".format(msg.sender))
-            return
+        # TODO: Добавить возможность создавать админов через консоль
+        # if msg.sender not in self.bp.admins:
+        #     self.cp.print("User '{}' tried to add new admin but was not admin".format(msg.sender))
+        #     return
         newAdminNick: str
         if len(args) == 0:
             newAdminNick = msg.sender
         else:
             newAdminNick = args[0]
         self.cp.print("Adding '{}' as bot admin...".format(newAdminNick))
+        self.csqs.addWhisperMessage("Для '{}' установлен статус администратора".format(newAdminNick), msg.sender, self.ocmf)
         self.bp.admins.append(newAdminNick)

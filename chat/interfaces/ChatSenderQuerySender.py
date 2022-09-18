@@ -9,6 +9,9 @@ class ChatSenderQuerySender:
         """
         self.addMessage(ocmf.globalMsg(msg))
 
+    def addWhisperMessage(self, msg: str, receiver: str, ocmf: OutgoingChatMessageFactory) -> None:
+        self.addMessage(ocmf.whisperMsg(msg, receiver))
+
     def addMessages(self, msgs: list[ChatMessage]) -> None:
         for msg in msgs:
             self.addMessage(msg)

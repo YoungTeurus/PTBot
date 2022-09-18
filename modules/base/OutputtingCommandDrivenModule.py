@@ -1,9 +1,7 @@
-from typing import Callable
-
-from chat.ChatMessage import ChatMessage
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from modules.base.CommandDrivenModule import CommandDrivenModule, ACTION_ON_COMMAND_ERROR_HANDLER
+from modules.base.CommandDrivenModule import CommandDrivenModule, ACTION_ON_COMMAND_ERROR_HANDLER, \
+    NON_COMMAND_MSG_HANDLER
 from utils.ConsoleProvider import ConsoleProvider
 
 
@@ -16,11 +14,11 @@ class OutputtingCommandDrivenModule(CommandDrivenModule):
 
     def __init__(self, cp: ConsoleProvider, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory,
                  actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
-                 actionOnNonCommandInput: Callable[[ChatMessage], None] = None,
-                 asseptNonCommandInputWithPrefix: bool = False):
-        super().__init__(cp, actionOnCommandError,
-                         actionOnNonCommandInput if (actionOnNonCommandInput is not None) else self.__defaultErrorHandler,
-                         asseptNonCommandInputWithPrefix)
+                 actionOnNonCommandInput: NON_COMMAND_MSG_HANDLER = None,
+                 acceptNonCommandInputWithPrefix: bool = False):
+        super().__init__(cp, actionOnCommandError if (actionOnCommandError is not None) else self.__defaultErrorHandler,
+                         actionOnNonCommandInput,
+                         acceptNonCommandInputWithPrefix)
         self.csqs = csqs
         self.ocmf = ocmf
 

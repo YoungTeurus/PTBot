@@ -1,7 +1,8 @@
 from typing import Callable, Optional
 
 from chat.ChatMessage import ChatMessage
-from chat.ChatObserver import ChatObserver, NotifyAction
+from chat.ChatObserver import NotifyAction
+from chat.SelfAwareChatObserver import SelfAwareChatObserver
 from properties import COMMAND_PREFIX
 from utils.ArgsDevider import splitArgs
 from utils.ConsoleProvider import ConsoleProvider
@@ -10,6 +11,8 @@ from utils.ConsoleProvider import ConsoleProvider
 ACTION_CALLBACK = Callable[[ChatMessage, list[str]], None]
 # (command, msg.sender, args, reason) => None
 ACTION_ON_COMMAND_ERROR_HANDLER = Callable[[str, str, list[str], str], None]
+# (msg) => action
+NON_COMMAND_MSG_HANDLER = Callable[[ChatMessage], NotifyAction]
 
 
 class ChatCommandArgPredicate:
@@ -65,7 +68,7 @@ class ChatCommand:
         self.optionalArgs = optionalArgs if optionalArgs is not None else []
 
 
-class CommandDrivenModule(ChatObserver):
+class CommandDrivenModule(SelfAwareChatObserver):
     """
     Модуль для работы с командами - сообщениями в чате, начинающимися со спецсимвола, при обработке которых необходимо
     выполнить какое-либо действие.
@@ -75,17 +78,17 @@ class CommandDrivenModule(ChatObserver):
     commands: dict[str, ChatCommand]
     # (command, msg.sender, args, reason) => None
     actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER
-    actionOnNonCommandInput: Optional[Callable[[ChatMessage], None]]
+    actionOnNonCommandInput: Optional[NON_COMMAND_MSG_HANDLER]
     acceptNonCommandInputWithPrefix: bool
 
     def __init__(self, cp: ConsoleProvider, actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
-                 actionOnNonCommandInput: Callable[[ChatMessage], None] = None,
-                 asseptNonCommandInputWithPrefix: bool = False):
+                 actionOnNonCommandInput: NON_COMMAND_MSG_HANDLER = None,
+                 acceptNonCommandInputWithPrefix: bool = False):
         self.cp = cp
         self.commands = {}
         self.actionOnCommandError = actionOnCommandError
         self.actionOnNonCommandInput = actionOnNonCommandInput
-        self.acceptNonCommandInputWithPrefix = asseptNonCommandInputWithPrefix
+        self.acceptNonCommandInputWithPrefix = acceptNonCommandInputWithPrefix
 
     def addCommand(self, chatCommand: ChatCommand):
         self.commands[chatCommand.command] = chatCommand
@@ -95,10 +98,10 @@ class CommandDrivenModule(ChatObserver):
             self.cp.print("Command '' was already in this module")
         self.addCommand(chatCommand)
 
-    def notify(self, msg: ChatMessage) -> NotifyAction:
+    def doOnOtherMessage(self, msg: ChatMessage) -> NotifyAction:
         if not msg.body.startswith(COMMAND_PREFIX):
             if self.actionOnNonCommandInput is not None:
-                self.actionOnNonCommandInput(msg)
+                return self.actionOnNonCommandInput(msg)
             return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
         command, args = CommandDrivenModule.__getCommandAndArgs(msg.body)
 

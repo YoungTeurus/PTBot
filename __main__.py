@@ -18,6 +18,7 @@ from modules.ChatToConsoleLogger import ChatToConsoleLogger
 from modules.SelfIdentify import SelfIdentify
 from modules.commands.AddAdminCommandModule import AddAdminCommandModule
 from modules.commands.Recorder import Recorder
+from modules.commands.SwitchableParrot import SwitchableParrot
 from properties import LOCAL_MODE
 from utils.BotProperites import BotProperties, BotState
 from utils.ConsoleProvider import ConsoleProvider
@@ -83,7 +84,7 @@ if __name__ == "__main__":
         cp.print("Loading custom modules (observers)...")
         bwc.add(InputFromConsoleWorker(cprovide, cp, bp, csqs))
 
-        # cprovide.addObserver(Parrot(csqs, ocmf))
+        cprovide.addObserver(SwitchableParrot(cp, csqs, ocmf, bp))
         cprovide.addObserver(Recorder(csqs, ocmf, cp))
         cprovide.addObserver(AddAdminCommandModule(csqs, ocmf, cp, bp))
         cp.print("Finished loading custom modules!")

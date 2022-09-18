@@ -1,4 +1,5 @@
 from chat.ChatMessage import ChatMessage
+from chat.ChatObserver import NotifyAction
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.CommandDrivenModule import ChatCommand
@@ -16,7 +17,7 @@ class Recorder(OutputtingCommandDrivenModule):
     def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory, cp: ConsoleProvider):
         super().__init__(cp, csqs, ocmf,
                          actionOnNonCommandInput=self.saveMessage,
-                         asseptNonCommandInputWithPrefix=True)
+                         acceptNonCommandInputWithPrefix=True)
         self.history = {}
 
         startCommand: ChatCommand = ChatCommand("start", self.startLogging)
@@ -58,11 +59,12 @@ class Recorder(OutputtingCommandDrivenModule):
                 self.csqs.addGlobalMessage(msg, self.ocmf)
         self.history.pop(msgSender)
 
-    def saveMessage(self, msg: ChatMessage) -> None:
+    def saveMessage(self, msg: ChatMessage) -> NotifyAction:
         if msg.type.isSentByBot:
-            return
+            return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
         msgSender = msg.sender
         if msgSender in self.history:
             msgBody = msg.body
             self.cp.print("Сохраняю сообщение от '{}' : '{}'".format(msgSender, msgBody))
             self.history[msgSender].append(msgBody)
+        return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
