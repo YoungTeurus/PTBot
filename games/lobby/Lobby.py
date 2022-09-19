@@ -57,29 +57,30 @@ class Lobby:
 
         self.open = True
 
-    def start(self) -> None:
+    def start(self) -> bool:
         if (playerCount := len(self.players)) < self.playerSettings.minPlayersForStart:
             CONSOLE.print("There was too few players ({}) in lobby to start need at least ({})"
                           .format(playerCount, self.playerSettings.minPlayersForStart))
             if self.playerSettings.onTooLittlePeopleToStart is not None:
                 self.playerSettings.onTooLittlePeopleToStart()
-            return
+            return False
         CONSOLE.print("Starting from lobby with players: {}".format(self.players))
         self.actionOnStart(self.players)
+        return True
 
-    def join(self, player: str) -> None:
+    def join(self, player: str) -> bool:
         if (playerCount := len(self.players)) >= self.playerSettings.maxPlayersInLobby:
             CONSOLE.print("There was too many players ({}) for new ('{}') to join in"
                           .format(playerCount, player))
             if self.playerSettings.onTooManyPeopleInLobby is not None:
                 self.playerSettings.onTooManyPeopleInLobby()
-            return
+            return False
 
         if player in self.players:
             CONSOLE.print("Player ('{}') was already in lobby".format(player))
             if self.playerSettings.onPlayerJoinAlreadyIn is not None:
                 self.playerSettings.onPlayerJoinAlreadyIn(player, self.players)
-            return
+            return False
 
         self.players.append(player)
         CONSOLE.print("'{}' joined the lobby ({}/{})"
@@ -87,19 +88,21 @@ class Lobby:
 
         if self.playerSettings.onPlayerJoin is not None:
             self.playerSettings.onPlayerJoin(player, self.players)
+        return True
 
-    def leave(self, player: str) -> None:
+    def leave(self, player: str) -> bool:
         if player not in self.players:
             CONSOLE.print("Player ('{}') was not in lobby to leave it".format(player))
             if self.playerSettings.onPlayerLeaveNotPresent is not None:
                 self.playerSettings.onPlayerLeaveNotPresent(player, self.players)
-            return
+            return False
 
         self.players.remove(player)
         CONSOLE.print("'{}' left the lobby ({}/{})".format(player, len(self.players),
                                                                     self.playerSettings.maxPlayersInLobby))
         if self.playerSettings.onPlayerLeave is not None:
             self.playerSettings.onPlayerLeave(player, self.players)
+        return True
 
     def close(self) -> None:
         CONSOLE.print("Closing lobby with players: {}".format(self.players))

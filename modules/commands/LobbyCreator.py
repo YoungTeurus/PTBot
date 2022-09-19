@@ -36,7 +36,6 @@ class LobbyCreator(OutputtingCommandDrivenChatObserver, CommandProvider):
             Command("лобби", self.__lobby, optionalArgs=[CommandArg("onlyAdmins")]),
         ]
 
-
     def __onLobbyClosure(self) -> None:
         self.lobby = None
         self.__setCommandOnLobbyClose()
@@ -49,7 +48,7 @@ class LobbyCreator(OutputtingCommandDrivenChatObserver, CommandProvider):
 
     def __onLobbyCreation(self) -> None:
         self.bannedPlayers = []
-        self.onlyAdminsCanJoin = False
+        self.onlyAdminsCanJoin = True
 
         # TODO установка параметров лобби:
         settings = PlayerLobbySettings(2, 4)
@@ -71,7 +70,6 @@ class LobbyCreator(OutputtingCommandDrivenChatObserver, CommandProvider):
         commandsToRemove = ["лобби"]
         self.removeCommands(commandsToRemove)
 
-
     def __lobby(self, args: ARGS_DICT) -> None:
         msg: ChatMessage = args[CHAT_MESSAGE_KEY]
         if not msg.type.isSentByBotAdmin:
@@ -81,16 +79,46 @@ class LobbyCreator(OutputtingCommandDrivenChatObserver, CommandProvider):
         self.lobby.join(msg.sender)
 
         if "onlyAdmins" in args:
-            self.onlyAdminsCanJoin = args["onlyAdmins"] == 'y'
+            self.onlyAdminsCanJoin = not (args["onlyAdmins"] == 'общее')
 
     def __settings(self, args: ARGS_DICT) -> None:
-        pass
+        if self.lobby is None:
+            self.globalMessage("Лобби не было создано, но эта команда сработала? ЧТО-ТО НЕ ТАК!")
+            return
+
+        msg: ChatMessage = args[CHAT_MESSAGE_KEY]
+        sender = msg.sender
+        if self.onlyAdminsCanJoin and not msg.type.isSentByBotAdmin:
+            self.globalMessage("{}, у тебя нет прав для изменения настроек лобби.".format(sender))
+            return
+
+        parameterName = args["name"]
+        # TODO: Переделать на dict
+        if parameterName == "админвход":
+            if "value" not in args:
+                self.whisperMessage(
+                    "Текущее значение 'админвход' = {} (не было изменено)".format(self.onlyAdminsCanJoin), sender)
+                return
+            value = args["value"]
+            if value == 'y':
+                self.onlyAdminsCanJoin = True
+            elif value == 'n':
+                self.onlyAdminsCanJoin = False
+            self.whisperMessage("Текущее значение 'админвход' = {}".format(self.onlyAdminsCanJoin), sender)
 
     def __start(self, args: ARGS_DICT) -> None:
-        pass
+        if self.lobby is None:
+            self.globalMessage("Лобби не было создано, но эта команда сработала? ЧТО-ТО НЕ ТАК!")
+            return
 
-    def __create(self, args: ARGS_DICT) -> None:
-        pass
+        msg: ChatMessage = args[CHAT_MESSAGE_KEY]
+        sender = msg.sender
+        if self.onlyAdminsCanJoin and not msg.type.isSentByBotAdmin:
+            self.globalMessage("{}, у тебя нет прав для старта лобби.".format(sender))
+            return
+
+        if self.lobby.start():
+            self.__onLobbyClosure()
 
     def __join(self, args: ARGS_DICT) -> None:
         if self.lobby is None:
@@ -144,7 +172,7 @@ class LobbyCreator(OutputtingCommandDrivenChatObserver, CommandProvider):
             self.globalMessage("Лобби не было создано, но эта команда сработала? ЧТО-ТО НЕ ТАК!")
             return
 
-        #TODO: ограничить использование
+        # TODO: ограничить использование
         self.globalMessage("Сейчас в лобби ({}/{}): {}"
                            .format(len(self.lobby.players),
                                    self.lobby.playerSettings.maxPlayersInLobby,
