@@ -1,23 +1,21 @@
 from threading import Lock, Thread
 
 from properties import LOGGING
-from utils.ConsoleProvider import ConsoleProvider
+from utils.ConsoleProvider import CONSOLE
 
 
 class BaseBotWorker(Thread):
     lock: Lock
     running: bool
-    cp: ConsoleProvider
 
-    def __init__(self, cp: ConsoleProvider):
+    def __init__(self):
         super().__init__()
         self.daemon = True
         self.running = False
-        self.cp = cp
 
     def prepare(self, lock: Lock) -> None:
         if LOGGING.logWorkers:
-            self.cp.print("Worker '{}' is preparing".format(self))
+            CONSOLE.print("Worker '{}' is preparing".format(self))
         self.preInit()
 
         self.lock = lock
@@ -26,7 +24,7 @@ class BaseBotWorker(Thread):
 
         self.postInit()
         if LOGGING.logWorkers:
-            self.cp.print("Worker '{}' is prepared".format(self))
+            CONSOLE.print("Worker '{}' is prepared".format(self))
 
     def preInit(self) -> None:
         pass
@@ -36,11 +34,11 @@ class BaseBotWorker(Thread):
 
     def run(self) -> None:
         if LOGGING.logWorkers:
-            self.cp.print("Worker '{}' began to run".format(self))
+            CONSOLE.print("Worker '{}' began to run".format(self))
         while self.running:
             self._doWhileRunning()
         if LOGGING.logWorkers:
-            self.cp.print("Worker '{}' stopped".format(self))
+            CONSOLE.print("Worker '{}' stopped".format(self))
 
     def hasWork(self) -> bool:
         return False
@@ -53,6 +51,6 @@ class BaseBotWorker(Thread):
 
     def interrupt(self):
         if LOGGING.logWorkers:
-            self.cp.print("Worker '{}' is interrupted".format(self))
+            CONSOLE.print("Worker '{}' is interrupted".format(self))
         self.running = False
         self.join()

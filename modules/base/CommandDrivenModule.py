@@ -4,9 +4,9 @@ from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
 from chat.SelfAwareChatObserver import SelfAwareChatObserver
 from modules.base.Command import Command, ARGS_DICT, CHAT_MESSAGE_KEY
-from modules.commands.CommandParser import CommandParser
 from properties import COMMAND_PREFIX
-from utils.ConsoleProvider import ConsoleProvider
+from utils.CommandParser import CommandParser
+from utils.ConsoleProvider import CONSOLE
 
 # (name, msg.sender, args, reason) => None
 ACTION_ON_COMMAND_ERROR_HANDLER = Callable[[str, str, list[str], str], None]
@@ -19,7 +19,6 @@ class CommandDrivenModule(SelfAwareChatObserver):
     Модуль для работы с командами - сообщениями в чате, начинающимися со спецсимвола, при обработке которых необходимо
     выполнить какое-либо действие.
     """
-    cp: ConsoleProvider
     # name => Command
     commands: dict[str, Command]
     # (name, msg.sender, args, reason) => None
@@ -27,22 +26,39 @@ class CommandDrivenModule(SelfAwareChatObserver):
     actionOnNonCommandInput: Optional[NON_COMMAND_MSG_HANDLER]
     acceptNonCommandInputWithPrefix: bool
 
-    def __init__(self, cp: ConsoleProvider, actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
+    def __init__(self, actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
                  actionOnNonCommandInput: NON_COMMAND_MSG_HANDLER = None,
                  acceptNonCommandInputWithPrefix: bool = False):
-        self.cp = cp
         self.commands = {}
         self.actionOnCommandError = actionOnCommandError
         self.actionOnNonCommandInput = actionOnNonCommandInput
         self.acceptNonCommandInputWithPrefix = acceptNonCommandInputWithPrefix
+
+        for command in self._getInitialCommands():
+            self.addCommand(command)
+
+    def _getInitialCommands(self) -> list[Command]:
+        raise NotImplementedError
+
+    def addCommands(self, chatCommands: list[Command]):
+        for command in chatCommands:
+            self.addCommand(command)
 
     def addCommand(self, chatCommand: Command):
         self.commands[chatCommand.name] = chatCommand
 
     def addCommandCheckIfExists(self, chatCommand: Command):
         if chatCommand.name in self.commands:
-            self.cp.print("Command '' was already in this module")
+            CONSOLE.print("Command '' was already in this module")
         self.addCommand(chatCommand)
+
+    def removeCommands(self, commandNames: list[str]):
+        for commandName in commandNames:
+            self.removeCommand(commandName)
+
+    def removeCommand(self, commandName: str):
+        if commandName in self.commands:
+            self.commands.pop(commandName)
 
     def doOnOtherMessage(self, msg: ChatMessage) -> NotifyAction:
         if not msg.body.startswith(COMMAND_PREFIX):
@@ -85,7 +101,7 @@ class CommandDrivenModule(SelfAwareChatObserver):
         return 0
 
     def onError(self, command: str, msgSender: str, args: list[str], reason: str) -> None:
-        self.cp.print("Ошибка в команде '{}', отправитель = '{}', арг-ы = '{}', причина = '{}'"
+        CONSOLE.print("Ошибка в команде '{}', отправитель = '{}', арг-ы = '{}', причина = '{}'"
                       .format(command, msgSender, args, reason))
         if self.actionOnCommandError is not None:
             self.actionOnCommandError(command, msgSender, args, reason)

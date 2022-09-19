@@ -5,7 +5,7 @@ from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.Command import CommandArg, ARGS_DICT, CHAT_MESSAGE_KEY
 from modules.base.CommandDrivenModule import Command
 from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
-from utils.ConsoleProvider import ConsoleProvider
+from utils.ConsoleProvider import CONSOLE
 from utils.Utils import CALLBACK_FUNCTION
 
 
@@ -15,8 +15,8 @@ class SwitchableParrot(OutputtingCommandDrivenModule):
 
     argsToCallback: dict[str, CALLBACK_FUNCTION]
 
-    def __init__(self, cp: ConsoleProvider, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory):
-        super().__init__(cp, csqs, ocmf, actionOnNonCommandInput=self.doParrot)
+    def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory):
+        super().__init__(csqs, ocmf, actionOnNonCommandInput=self.doParrot)
         self.enabled = False
         self.onlyAnonimous = False
 
@@ -26,9 +26,8 @@ class SwitchableParrot(OutputtingCommandDrivenModule):
             "аноним": self.turnAnonim,
         }
 
-        optionalArgs = [CommandArg("newState")]
-
-        self.addCommand(Command("попуг", self.doSwitch, optionalArgs=optionalArgs))
+    def _getInitialCommands(self) -> list[Command]:
+        return [Command("попуг", self.doSwitch, optionalArgs=[CommandArg("newState")])]
 
     def doSwitch(self, args: ARGS_DICT) -> None:
         msg: ChatMessage = args[CHAT_MESSAGE_KEY]
@@ -40,7 +39,7 @@ class SwitchableParrot(OutputtingCommandDrivenModule):
                 if newState in self.argsToCallback:
                     self.argsToCallback[newState]()
         else:
-            self.csqs.addGlobalMessage('Ты недостоин взаимодействовать с моим тумблером!', self.ocmf)
+            self.globalMessage('Ты недостоин взаимодействовать с моим тумблером!')
 
     def switch(self) -> None:
         newEnabled = not self.enabled
@@ -51,34 +50,34 @@ class SwitchableParrot(OutputtingCommandDrivenModule):
 
     def turnOn(self) -> None:
         if self.enabled:
-            self.csqs.addGlobalMessage('Но я уже был включён!', self.ocmf)
+            self.globalMessage('Но я уже был включён!')
             return
         self.enabled = True
         self.onlyAnonimous = False
-        self.csqs.addGlobalMessage('Попугай активирован!', self.ocmf)
+        self.globalMessage('Попугай активирован!')
 
     def turnOff(self) -> None:
         if not self.enabled:
-            self.csqs.addGlobalMessage('Но я уже был выключен!', self.ocmf)
+            self.globalMessage('Но я уже был выключен!')
             return
         self.enabled = False
         self.onlyAnonimous = False
         self.csqs.cleanMsgQueue()
-        self.csqs.addGlobalMessage('Попугай деактивирован!', self.ocmf)
+        self.globalMessage('Попугай деактивирован!')
 
     def turnAnonim(self) -> None:
         if not self.enabled:
             self.turnOn()
         self.onlyAnonimous = not self.onlyAnonimous
         if self.onlyAnonimous:
-            self.csqs.addGlobalMessage('Режим анонимки активирован!', self.ocmf)
+            self.globalMessage('Режим анонимки активирован!')
         else:
-            self.csqs.addGlobalMessage('Режим анонимки деактивирован!', self.ocmf)
+            self.globalMessage('Режим анонимки деактивирован!')
 
     def doParrot(self, msg: ChatMessage) -> NotifyAction:
         if self.enabled:
             if msg.type.isWhisper:
-                self.csqs.addGlobalMessage('Кто-то прошептал(а): "{}"'.format(msg.body), self.ocmf)
+                self.globalMessage('Кто-то прошептал(а): "{}"'.format(msg.body))
             elif not self.onlyAnonimous:
-                self.csqs.addGlobalMessage('{} сказал(а): "{}"'.format(msg.sender, msg.body), self.ocmf)
+                self.globalMessage('{} сказал(а): "{}"'.format(msg.sender, msg.body))
         return NotifyAction.CONTINUE_TO_NEXT_OBSERVER

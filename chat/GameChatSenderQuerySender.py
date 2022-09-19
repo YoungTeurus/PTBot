@@ -2,17 +2,15 @@ from chat.ChatMessage import ChatMessage
 from chat.OutgoingChatMessagePreprocessor import OutgoingChatMessagePreprocessor
 from chat.interfaces.ChatSender import ChatSender
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from utils.ConsoleProvider import ConsoleProvider
+from utils.ConsoleProvider import CONSOLE
 
 
 class GameChatSenderQuerySender(ChatSenderQuerySender):
     __chatSender: ChatSender
-    cp: ConsoleProvider
     __sendQuery: list[str]
 
-    def __init__(self, chatSender: ChatSender, cp: ConsoleProvider):
+    def __init__(self, chatSender: ChatSender):
         self.__chatSender = chatSender
-        self.cp = cp
         self.__sendQuery = []
 
     def addMessage(self, msg: ChatMessage) -> None:
@@ -21,12 +19,12 @@ class GameChatSenderQuerySender(ChatSenderQuerySender):
     def sendNextMessage(self) -> None:
         try:
             msgToSend = self.__sendQuery.pop(0)
-            self.cp.print("Sending message '{}'".format(msgToSend))
+            CONSOLE.print("Sending message '{}'".format(msgToSend))
             self.__chatSender.sendMessage(msgToSend)
         except IndexError:
-            self.cp.print("Tried to send message while not having one in queue")
+            CONSOLE.print("Tried to send message while not having one in queue")
         except RuntimeError as err:
-            self.cp.print("Error happened while sending message: {}".format(err))
+            CONSOLE.print("Error happened while sending message: {}".format(err))
 
     def hasMsgs(self) -> bool:
         return len(self.__sendQuery) > 0

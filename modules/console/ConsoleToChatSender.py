@@ -3,21 +3,19 @@ from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.Command import Command, CommandArg, ARGS_DICT
 from modules.base.CommandProvider import CommandProvider
-from utils.ConsoleProvider import ConsoleProvider
+from utils.ConsoleProvider import CONSOLE
 from utils.Utils import addBotInputPrefix
 
 
 class ConsoleToChatSender(CommandProvider):
-    cp: ConsoleProvider
     csqs: ChatSenderQuerySender
     ocmf: OutgoingChatMessageFactory
 
-    def __init__(self, cp: ConsoleProvider, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory):
-        self.cp = cp
+    def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory):
         self.csqs = csqs
         self.ocmf = ocmf
 
-    def getConsoleCommands(self) -> list[Command]:
+    def _getConsoleCommands(self) -> list[Command]:
         optionalArgs = [
             CommandArg("body"),
         ]
@@ -27,8 +25,8 @@ class ConsoleToChatSender(CommandProvider):
     def sendMessageFromConsoleToChat(self, args: ARGS_DICT) -> None:
         newMsg: ChatMessage
         if "body" not in args:
-            newMsg = self.cp.runInConsoleLockWithResult(self.__inputMessage)
-        elif len(args) == 1:
+            newMsg = CONSOLE.runInConsoleLockWithResult(self.__inputMessage)
+        else:
             newMsg = self.ocmf.globalMsg(args["body"])
 
         self.csqs.addMessage(newMsg)

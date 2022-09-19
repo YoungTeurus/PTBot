@@ -4,24 +4,22 @@ from chat.IncomingChatMessageProcessor import IncomingChatMessageProcessor
 from modules.base.Command import Command, CommandArg, ARGS_DICT
 from modules.base.CommandProvider import CommandProvider
 from utils.BotProperites import BotProperties
-from utils.ConsoleProvider import ConsoleProvider
+from utils.ConsoleProvider import CONSOLE
 from utils.Utils import addBotInputPrefix
 
 
 class ConsoleToBotSender(CommandProvider):
-    cp: ConsoleProvider
     bp: BotProperties
     icmp: IncomingChatMessageProcessor
     cprovide: ChatProvider
 
-    def __init__(self, cp: ConsoleProvider, bp: BotProperties, icmp: IncomingChatMessageProcessor,
+    def __init__(self, bp: BotProperties, icmp: IncomingChatMessageProcessor,
                  cprovide: ChatProvider):
-        self.cp = cp
         self.bp = bp
         self.icmp = icmp
         self.cprovide = cprovide
 
-    def getConsoleCommands(self) -> list[Command]:
+    def _getConsoleCommands(self) -> list[Command]:
 
         optionalArgs = [
             CommandArg("sender"),
@@ -33,11 +31,11 @@ class ConsoleToBotSender(CommandProvider):
     def sendMessageFromConsoleToBot(self, args: ARGS_DICT) -> None:
         newMsg: ChatMessage
         if len(args) == 0:
-            newMsg = self.cp.runInConsoleLockWithResult(self.__inputMessage)
+            newMsg = CONSOLE.runInConsoleLockWithResult(self.__inputMessage)
         elif len(args) == 2:
             newMsg = self.__createMessage(args["sender"], args["body"]).build()
         else:
-            self.cp.print(addBotInputPrefix("Wrong number of args, expected 0 or 2 - sender and body"))
+            CONSOLE.print(addBotInputPrefix("Wrong number of args, expected 0 or 2 - sender and body"))
             return
         self.icmp.process(newMsg)
         self.cprovide.cleanAndAddMultipleMessages([newMsg])

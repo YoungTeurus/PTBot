@@ -20,3 +20,6 @@ class ConsoleProvider:
     def runInConsoleLockWithResult(self, func: T_SUPPLIER) -> T:
         with self.lock:
             return func()
+
+
+CONSOLE = ConsoleProvider()

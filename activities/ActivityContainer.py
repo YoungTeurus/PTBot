@@ -1,25 +1,23 @@
 from threading import Lock
 
 from activities.BaseActivity import BaseActivity
-from utils.ConsoleProvider import ConsoleProvider
+from utils.ConsoleProvider import CONSOLE
 
 
 class ActivityContainer:
     lock: Lock
     activities: list[BaseActivity]
-    cp: ConsoleProvider
 
-    def __init__(self, cp: ConsoleProvider):
+    def __init__(self):
         self.lock = Lock()
         self.activities = []
-        self.cp = cp
 
     def add(self, activity: BaseActivity) -> None:
         def selfRemoveWrapper() -> None:
             self.__remove(activity)
 
         self.activities.append(activity)
-        self.cp.print("Activity '{}' was added".format(activity))
+        CONSOLE.print("Activity '{}' was added".format(activity))
         activity.prepare(self.lock, selfRemoveWrapper)
 
     def __remove(self, activity: BaseActivity) -> None:

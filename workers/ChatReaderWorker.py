@@ -8,7 +8,6 @@ from chat.ChatProvider import ChatProvider
 from chat.ChatReader import ChatReader
 from chat.IncomingChatMessageProcessor import IncomingChatMessageProcessor
 from properties import CHAT_READER_WORKER
-from utils.ConsoleProvider import ConsoleProvider
 from workers.base.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
 
 
@@ -20,10 +19,9 @@ class ChatReaderWorker(WorkLockingBaseBotWorker):
     lastCheckTime: float
     secsBetweenChecks: float = CHAT_READER_WORKER["secsBetweenChecks"]
 
-    def __init__(self, chatReader: ChatReader,
-                 chatParser: ChatParser, chatProvider: ChatProvider, chatMessageProcessor: IncomingChatMessageProcessor,
-                 cp: ConsoleProvider):
-        super().__init__(cp)
+    def __init__(self, chatReader: ChatReader, chatParser: ChatParser, chatProvider: ChatProvider,
+                 chatMessageProcessor: IncomingChatMessageProcessor):
+        super().__init__()
         self.chatReader = chatReader
         self.chatParser = chatParser
         self.chatProvider = chatProvider

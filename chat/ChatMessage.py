@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import datetime
 
-UNKNOWN = "UNKNOWN"
-BOT_NAME = "BOT_NAME"
 SYSTEM = "SYSTEM"
 EVERYONE = "EVERYONE"
 

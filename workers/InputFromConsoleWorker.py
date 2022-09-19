@@ -1,6 +1,6 @@
-from modules.commands.CommandParser import CommandParser
+from utils.CommandParser import CommandParser
 from modules.console.CommandController import CommandController
-from utils.ConsoleProvider import ConsoleProvider
+from utils.ConsoleProvider import CONSOLE
 from utils.TimedInput import input_with_timeout, TimeoutExpired
 from utils.Utils import STRING_CONSUMER, addBotInputPrefix
 from workers.base.BaseBotWorker import BaseBotWorker
@@ -13,19 +13,19 @@ class ConsoleInputConsumer(BaseBotWorker):
     """
     inputConsumer: STRING_CONSUMER
 
-    def __init__(self, cp: ConsoleProvider, inputConsumer: STRING_CONSUMER):
-        super().__init__(cp)
+    def __init__(self, inputConsumer: STRING_CONSUMER):
+        super().__init__()
         self.inputConsumer = inputConsumer
 
     def _doWhileRunning(self) -> None:
         try:
             i = input_with_timeout(timeout=1)
             if len(i) > 0:
-                command = self.cp.runInConsoleLockWithResult(self.__inputCommand)
+                command = CONSOLE.runInConsoleLockWithResult(self.__inputCommand)
                 if len(command.strip()) > 0:
                     self.inputConsumer(command)
                 else:
-                    self.cp.print(addBotInputPrefix("No command found"))
+                    CONSOLE.print(addBotInputPrefix("No command found"))
         except TimeoutExpired:
             pass
 
@@ -38,13 +38,13 @@ class InputFromConsoleWorker(WorkLockingBaseBotWorker):
     cic: ConsoleInputConsumer
     cc: CommandController
 
-    def __init__(self, cp: ConsoleProvider, cc: CommandController):
-        super().__init__(cp)
-        self.cp = cp
+    def __init__(self, cc: CommandController):
+        super().__init__()
         self.cc = cc
 
     def postInit(self) -> None:
-        self.cic = ConsoleInputConsumer(self.cp, self.onNewInput)
+        # TODO: Избавиться от лишнего WORKER!
+        self.cic = ConsoleInputConsumer(self.onNewInput)
         # noinspection PyTypeChecker
         self.cic.prepare(None)
 
