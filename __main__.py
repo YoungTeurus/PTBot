@@ -1,3 +1,5 @@
+from time import sleep
+
 from selenium.webdriver.firefox.webdriver import WebDriver
 
 from activities.ActivityContainer import ActivityContainer
@@ -17,6 +19,7 @@ from driver.LocalStorage import LocalStorage
 from modules.ChatToConsoleLogger import ChatToConsoleLogger
 from modules.SelfIdentify import SelfIdentify
 from modules.commands.AddAdminCommandModule import AddAdminCommandModule
+from modules.commands.LobbyCreator import LobbyCreator
 from modules.commands.Recorder import Recorder
 from modules.commands.SwitchableParrot import SwitchableParrot
 from modules.console.CommandController import CommandController
@@ -96,6 +99,9 @@ if __name__ == "__main__":
         aacm = AddAdminCommandModule(csqs, ocmf, bp)
         cc.addCommands(aacm._getConsoleCommands())
         cprovide.addObserver(aacm)
+
+        cprovide.addObserver(LobbyCreator(csqs, ocmf, bp))
+
         CONSOLE.print("Finished loading custom modules!")
 
 
@@ -109,6 +115,6 @@ if __name__ == "__main__":
 
     try:
         while True:
-            pass
+            sleep(1)
     except KeyboardInterrupt:
         bwc.stopAll()

@@ -1,5 +1,4 @@
-from collections import Callable
-from typing import Optional
+from typing import Optional, Callable
 
 from utils.ConsoleProvider import CONSOLE
 from utils.Utils import CALLBACK_FUNCTION
@@ -7,73 +6,100 @@ from utils.Utils import CALLBACK_FUNCTION
 # (players) => None
 ON_START_CALLBACK = ON_CLOSE_CALLBACK = Callable[[list[str]], None]
 # (quited_player, remained_players) => None
-ON_PLAYER_ENTER_CALLBACK = ON_PLAYER_LEAVE_CALLBACK = Callable[[str, list[str]], None]
+ON_PLAYER_JOIN_CALLBACK = ON_PLAYER_LEAVE_CALLBACK = Callable[[str, list[str]], None]
 
 
-class PlayerCountLobbySettings:
+class PlayerLobbySettings:
     minPlayersForStart: int
     onTooLittlePeopleToStart: Optional[CALLBACK_FUNCTION]
     maxPlayersInLobby: int
     onTooManyPeopleInLobby: Optional[CALLBACK_FUNCTION]
 
-    # TODO: init
+    onPlayerJoin: Optional[ON_PLAYER_JOIN_CALLBACK]
+    onPlayerJoinAlreadyIn: Optional[ON_PLAYER_JOIN_CALLBACK]
+    onPlayerLeave: Optional[ON_PLAYER_LEAVE_CALLBACK]
+    onPlayerLeaveNotPresent: Optional[ON_PLAYER_LEAVE_CALLBACK]
+
+    def __init__(self, minPlayersForStart: int,
+                 maxPlayersInLobby: int,
+                 onTooLittlePeopleToStart: Optional[CALLBACK_FUNCTION] = None,
+                 onTooManyPeopleInLobby: Optional[CALLBACK_FUNCTION] = None,
+                 onPlayerJoin: Optional[ON_PLAYER_JOIN_CALLBACK] = None,
+                 onPlayerJoinAlreadyIn: Optional[ON_PLAYER_JOIN_CALLBACK] = None,
+                 onPlayerLeave: Optional[ON_PLAYER_LEAVE_CALLBACK] = None,
+                 onPlayerLeaveNotPresent: Optional[ON_PLAYER_LEAVE_CALLBACK] = None):
+        self.minPlayersForStart = minPlayersForStart
+        self.onTooLittlePeopleToStart = onTooLittlePeopleToStart
+        self.maxPlayersInLobby = maxPlayersInLobby
+        self.onTooManyPeopleInLobby = onTooManyPeopleInLobby
+        self.onPlayerJoin = onPlayerJoin
+        self.onPlayerJoinAlreadyIn = onPlayerJoinAlreadyIn
+        self.onPlayerLeave = onPlayerLeave
+        self.onPlayerLeaveNotPresent = onPlayerLeaveNotPresent
 
 
 class Lobby:
-    playerCountSettings: PlayerCountLobbySettings
+    playerSettings: PlayerLobbySettings
 
     players: list[str]
     actionOnStart: ON_START_CALLBACK
-    actionOnPlayerEnter: Optional[ON_PLAYER_ENTER_CALLBACK]
-    actionOnPlayerLeave: Optional[ON_PLAYER_LEAVE_CALLBACK]
-    actionOnPlayerLeaveNotPresent: Optional[ON_PLAYER_LEAVE_CALLBACK]
     actionOnClose: Optional[ON_CLOSE_CALLBACK]
 
     open: bool
 
-    def __init__(self, settings: PlayerCountLobbySettings, actionOnStart: ON_START_CALLBACK,
-                 actionOnPlayerEnter: ON_PLAYER_ENTER_CALLBACK = None,
-                 actionOnPlayerLeave: ON_PLAYER_LEAVE_CALLBACK = None,
-                 actionOnPlayerLeaveNotPresent: ON_PLAYER_LEAVE_CALLBACK = None,
+    def __init__(self, playerSettings: PlayerLobbySettings,
+                 actionOnStart: ON_START_CALLBACK,
                  actionOnClose: ON_CLOSE_CALLBACK = None):
-        self.playerCountSettings = settings
+        self.playerSettings = playerSettings
         self.players = []
         self.actionOnStart = actionOnStart
-        self.actionOnPlayerEnter = actionOnPlayerEnter
-        self.actionOnPlayerLeave = actionOnPlayerLeave
-        self.actionOnPlayerLeaveNotPresent = actionOnPlayerLeaveNotPresent
         self.actionOnClose = actionOnClose
 
         self.open = True
 
     def start(self) -> None:
-        if (playerCount := len(self.players)) < self.playerCountSettings.minPlayersForStart:
+        if (playerCount := len(self.players)) < self.playerSettings.minPlayersForStart:
             CONSOLE.print("There was too few players ({}) in lobby to start need at least ({})"
-                          .format(playerCount, self.playerCountSettings.minPlayersForStart))
-            if self.playerCountSettings.onTooLittlePeopleToStart is not None:
-                self.playerCountSettings.onTooLittlePeopleToStart()
+                          .format(playerCount, self.playerSettings.minPlayersForStart))
+            if self.playerSettings.onTooLittlePeopleToStart is not None:
+                self.playerSettings.onTooLittlePeopleToStart()
+            return
         CONSOLE.print("Starting from lobby with players: {}".format(self.players))
         self.actionOnStart(self.players)
 
-    def enter(self, player: str) -> None:
-        if (playerCount := len(self.players)) >= self.playerCountSettings.maxPlayersInLobby:
+    def join(self, player: str) -> None:
+        if (playerCount := len(self.players)) >= self.playerSettings.maxPlayersInLobby:
             CONSOLE.print("There was too many players ({}) for new ('{}') to join in"
                           .format(playerCount, player))
-            if self.playerCountSettings.onTooManyPeopleInLobby is not None:
-                self.playerCountSettings.onTooManyPeopleInLobby()
-        CONSOLE.print("Adding ('{}') as a new player in lobby ({}/{})"
-                      .format(player, playerCount, self.playerCountSettings.maxPlayersInLobby))
+            if self.playerSettings.onTooManyPeopleInLobby is not None:
+                self.playerSettings.onTooManyPeopleInLobby()
+            return
+
+        if player in self.players:
+            CONSOLE.print("Player ('{}') was already in lobby".format(player))
+            if self.playerSettings.onPlayerJoinAlreadyIn is not None:
+                self.playerSettings.onPlayerJoinAlreadyIn(player, self.players)
+            return
+
+        self.players.append(player)
+        CONSOLE.print("'{}' joined the lobby ({}/{})"
+                      .format(player, len(self.players), self.playerSettings.maxPlayersInLobby))
+
+        if self.playerSettings.onPlayerJoin is not None:
+            self.playerSettings.onPlayerJoin(player, self.players)
 
     def leave(self, player: str) -> None:
         if player not in self.players:
             CONSOLE.print("Player ('{}') was not in lobby to leave it".format(player))
-            if self.actionOnPlayerLeaveNotPresent is not None:
-                self.actionOnPlayerLeaveNotPresent(player, self.players)
+            if self.playerSettings.onPlayerLeaveNotPresent is not None:
+                self.playerSettings.onPlayerLeaveNotPresent(player, self.players)
+            return
+
         self.players.remove(player)
-        CONSOLE.print("Player ('{}') left the lobby ({}/{})".format(player, len(self.players),
-                                                                    self.playerCountSettings.maxPlayersInLobby))
-        if self.actionOnPlayerLeave is not None:
-            self.actionOnPlayerLeave(player, self.players)
+        CONSOLE.print("'{}' left the lobby ({}/{})".format(player, len(self.players),
+                                                                    self.playerSettings.maxPlayersInLobby))
+        if self.playerSettings.onPlayerLeave is not None:
+            self.playerSettings.onPlayerLeave(player, self.players)
 
     def close(self) -> None:
         CONSOLE.print("Closing lobby with players: {}".format(self.players))

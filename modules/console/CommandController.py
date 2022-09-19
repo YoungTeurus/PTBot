@@ -30,10 +30,12 @@ class CommandController:
 
             argLenCheck = currentCommand.checkArgsLength(args)
             if argLenCheck > 0:
-                onError(command, args, "Length of args is more than args len for command")
+                if onError is not None:
+                    onError(command, args, "Length of args is more than args len for command")
                 return
             elif argLenCheck < 0:
-                onError(command, args, "Length of args is lesser than args len for command")
+                if onError is not None:
+                    onError(command, args, "Length of args is lesser than args len for command")
                 return
 
             argsDict = currentCommand.createArgsDict(args)

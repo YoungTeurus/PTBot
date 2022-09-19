@@ -3,12 +3,12 @@ from chat.ChatObserver import NotifyAction
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.Command import ARGS_DICT, CHAT_MESSAGE_KEY
-from modules.base.CommandDrivenModule import Command
-from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
+from modules.base.CommandDrivenChatObserver import Command
+from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenChatObserver
 from utils.ConsoleProvider import CONSOLE
 
 
-class Recorder(OutputtingCommandDrivenModule):
+class Recorder(OutputtingCommandDrivenChatObserver):
     """
     Позволяет записывать сообщения игроков и воспроизводить их.
     """

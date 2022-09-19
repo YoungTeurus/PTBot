@@ -3,12 +3,12 @@ from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.Command import CHAT_MESSAGE_KEY, ARGS_DICT, CommandArg, Command
 from modules.base.CommandProvider import CommandProvider
-from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
+from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenChatObserver
 from utils.BotProperites import BotProperties
 from utils.ConsoleProvider import CONSOLE
 
 
-class AddAdminCommandModule(OutputtingCommandDrivenModule, CommandProvider):
+class AddAdminCommandModule(OutputtingCommandDrivenChatObserver, CommandProvider):
     bp: BotProperties
 
     def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory,

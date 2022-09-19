@@ -1,7 +1,7 @@
-from utils.CommandParser import CommandParser
 from modules.console.CommandController import CommandController
+from utils.CommandParser import CommandParser
 from utils.ConsoleProvider import CONSOLE
-from utils.TimedInput import input_with_timeout, TimeoutExpired
+from utils.TimedInput import wasKeyHitInTime
 from utils.Utils import STRING_CONSUMER, addBotInputPrefix
 from workers.base.BaseBotWorker import BaseBotWorker
 from workers.base.WorkLockingBaseBotWorker import WorkLockingBaseBotWorker
@@ -18,16 +18,10 @@ class ConsoleInputConsumer(BaseBotWorker):
         self.inputConsumer = inputConsumer
 
     def _doWhileRunning(self) -> None:
-        try:
-            i = input_with_timeout(timeout=1)
-            if len(i) > 0:
-                command = CONSOLE.runInConsoleLockWithResult(self.__inputCommand)
-                if len(command.strip()) > 0:
-                    self.inputConsumer(command)
-                else:
-                    CONSOLE.print(addBotInputPrefix("No command found"))
-        except TimeoutExpired:
-            pass
+        if wasKeyHitInTime(1):
+            command = CONSOLE.runInConsoleLockWithResult(self.__inputCommand)
+            if len(command.strip()) > 0:
+                self.inputConsumer(command)
 
     @staticmethod
     def __inputCommand() -> str:

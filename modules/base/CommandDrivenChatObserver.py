@@ -14,7 +14,7 @@ ACTION_ON_COMMAND_ERROR_HANDLER = Callable[[str, str, list[str], str], None]
 NON_COMMAND_MSG_HANDLER = Callable[[ChatMessage], NotifyAction]
 
 
-class CommandDrivenModule(SelfAwareChatObserver):
+class CommandDrivenChatObserver(SelfAwareChatObserver):
     """
     Модуль для работы с командами - сообщениями в чате, начинающимися со спецсимвола, при обработке которых необходимо
     выполнить какое-либо действие.

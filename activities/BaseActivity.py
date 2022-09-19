@@ -5,14 +5,12 @@ from utils.Utils import CALLBACK_FUNCTION
 
 
 class BaseActivity:
-    cp: ConsoleProvider
     lock: Lock
     running: bool
     selfRemove: CALLBACK_FUNCTION
 
-    def __init__(self, cp: ConsoleProvider):
+    def __init__(self):
         self.running = False
-        CONSOLE = cp
 
     def prepare(self, lock: Lock, selfRemove: CALLBACK_FUNCTION) -> None:
         CONSOLE.print("Activity '{}' is preparing...".format(self))

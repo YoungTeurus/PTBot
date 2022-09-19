@@ -3,13 +3,13 @@ from chat.ChatObserver import NotifyAction
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.Command import CommandArg, ARGS_DICT, CHAT_MESSAGE_KEY
-from modules.base.CommandDrivenModule import Command
-from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
+from modules.base.CommandDrivenChatObserver import Command
+from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenChatObserver
 from utils.ConsoleProvider import CONSOLE
 from utils.Utils import CALLBACK_FUNCTION
 
 
-class SwitchableParrot(OutputtingCommandDrivenModule):
+class SwitchableParrot(OutputtingCommandDrivenChatObserver):
     enabled: bool
     onlyAnonimous: bool
 

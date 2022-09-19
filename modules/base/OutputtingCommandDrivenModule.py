@@ -2,11 +2,11 @@ from abc import ABCMeta
 
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from modules.base.CommandDrivenModule import CommandDrivenModule, ACTION_ON_COMMAND_ERROR_HANDLER, \
+from modules.base.CommandDrivenChatObserver import CommandDrivenChatObserver, ACTION_ON_COMMAND_ERROR_HANDLER, \
     NON_COMMAND_MSG_HANDLER
 
 
-class OutputtingCommandDrivenModule(CommandDrivenModule, metaclass=ABCMeta):
+class OutputtingCommandDrivenChatObserver(CommandDrivenChatObserver, metaclass=ABCMeta):
     """
     Расширение модуля для работы с командами - добавлен стандартный обработчик ошибок и поля для работы с консолью.
     """

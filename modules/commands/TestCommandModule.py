@@ -1,9 +1,9 @@
 from modules.base.Command import ARGS_DICT, Command, CommandArg
-from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenModule
+from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenChatObserver
 from utils.ConsoleProvider import CONSOLE
 
 
-class TestCommandModule(OutputtingCommandDrivenModule):
+class TestCommandModule(OutputtingCommandDrivenChatObserver):
 
     def _getInitialCommands(self) -> list[Command]:
         return [Command("test", self.sayFirstArg, [CommandArg("text")])]

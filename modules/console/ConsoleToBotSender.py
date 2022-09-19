@@ -30,13 +30,10 @@ class ConsoleToBotSender(CommandProvider):
 
     def sendMessageFromConsoleToBot(self, args: ARGS_DICT) -> None:
         newMsg: ChatMessage
-        if len(args) == 0:
-            newMsg = CONSOLE.runInConsoleLockWithResult(self.__inputMessage)
-        elif len(args) == 2:
+        if "sender" in args and "body" in args:
             newMsg = self.__createMessage(args["sender"], args["body"]).build()
         else:
-            CONSOLE.print(addBotInputPrefix("Wrong number of args, expected 0 or 2 - sender and body"))
-            return
+            newMsg = CONSOLE.runInConsoleLockWithResult(self.__inputMessage)
         self.icmp.process(newMsg)
         self.cprovide.cleanAndAddMultipleMessages([newMsg])
 
