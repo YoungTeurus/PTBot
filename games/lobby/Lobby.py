@@ -4,17 +4,17 @@ from utils.ConsoleProvider import CONSOLE
 from utils.Utils import CALLBACK_FUNCTION
 
 # (players) => None
-ON_START_CALLBACK = ON_CLOSE_CALLBACK = Callable[[list[str]], None]
+PLAYERS_CALLBACK = ON_START_CALLBACK = ON_CLOSE_CALLBACK = Callable[[list[str]], None]
 # (quited_player, remained_players) => None
 ON_PLAYER_JOIN_CALLBACK = ON_PLAYER_LEAVE_CALLBACK = Callable[[str, list[str]], None]
 
 
 class PlayerLobbySettings:
     minPlayersForStart: int
-    onTooLittlePeopleToStart: Optional[CALLBACK_FUNCTION]
     maxPlayersInLobby: int
-    onTooManyPeopleInLobby: Optional[CALLBACK_FUNCTION]
 
+    onTooLittlePeopleToStart: Optional[PLAYERS_CALLBACK]
+    onTooManyPeopleInLobby: Optional[ON_PLAYER_JOIN_CALLBACK]
     onPlayerJoin: Optional[ON_PLAYER_JOIN_CALLBACK]
     onPlayerJoinAlreadyIn: Optional[ON_PLAYER_JOIN_CALLBACK]
     onPlayerLeave: Optional[ON_PLAYER_LEAVE_CALLBACK]
@@ -22,8 +22,8 @@ class PlayerLobbySettings:
 
     def __init__(self, minPlayersForStart: int,
                  maxPlayersInLobby: int,
-                 onTooLittlePeopleToStart: Optional[CALLBACK_FUNCTION] = None,
-                 onTooManyPeopleInLobby: Optional[CALLBACK_FUNCTION] = None,
+                 onTooLittlePeopleToStart: Optional[PLAYERS_CALLBACK] = None,
+                 onTooManyPeopleInLobby: Optional[ON_PLAYER_JOIN_CALLBACK] = None,
                  onPlayerJoin: Optional[ON_PLAYER_JOIN_CALLBACK] = None,
                  onPlayerJoinAlreadyIn: Optional[ON_PLAYER_JOIN_CALLBACK] = None,
                  onPlayerLeave: Optional[ON_PLAYER_LEAVE_CALLBACK] = None,
@@ -62,7 +62,7 @@ class Lobby:
             CONSOLE.print("There was too few players ({}) in lobby to start need at least ({})"
                           .format(playerCount, self.playerSettings.minPlayersForStart))
             if self.playerSettings.onTooLittlePeopleToStart is not None:
-                self.playerSettings.onTooLittlePeopleToStart()
+                self.playerSettings.onTooLittlePeopleToStart(self.players)
             return False
         CONSOLE.print("Starting from lobby with players: {}".format(self.players))
         self.actionOnStart(self.players)
@@ -73,7 +73,7 @@ class Lobby:
             CONSOLE.print("There was too many players ({}) for new ('{}') to join in"
                           .format(playerCount, player))
             if self.playerSettings.onTooManyPeopleInLobby is not None:
-                self.playerSettings.onTooManyPeopleInLobby()
+                self.playerSettings.onTooManyPeopleInLobby(player, self.players)
             return False
 
         if player in self.players:
