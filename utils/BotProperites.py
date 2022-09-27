@@ -6,7 +6,9 @@ from properties import START_UP_ADMINS
 
 class BotState(Enum):
     STARTING = 1
-    INITIALIZED = 2
+    ENTERED_GAME = 2
+    INITIALIZED = 3
+
 
 class BotProperties:
     botName: Optional[str]
