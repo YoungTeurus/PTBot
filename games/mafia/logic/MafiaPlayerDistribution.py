@@ -1,6 +1,7 @@
-from collections import Callable
+from typing import Callable
 
-from games.mafia.logic.MafiaRole import MafiaRole, CIVILIAN, MAFIA, COMMISSAR
+from games.mafia.logic.MafiaRole import MafiaRole
+from games.mafia.logic.MafiaRolesDefinitions import CIVILIAN, COMMISSAR, MAFIA
 
 # Словарь "число игроков" -> "поставщик состава ролей" для такого количества игроков
 PLAYABLE_CONFIGURATIONS: dict[int, Callable[[], list[MafiaRole]]] = {

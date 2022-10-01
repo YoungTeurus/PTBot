@@ -2,8 +2,7 @@ from abc import ABCMeta
 
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from modules.base.CommandDrivenChatObserver import CommandDrivenChatObserver, ACTION_ON_COMMAND_ERROR_HANDLER, \
-    NON_COMMAND_MSG_HANDLER
+from modules.base.CommandDrivenChatObserver import CommandDrivenChatObserver, ACTION_ON_COMMAND_ERROR_HANDLER
 
 
 class OutputtingCommandDrivenChatObserver(CommandDrivenChatObserver, metaclass=ABCMeta):
@@ -15,10 +14,8 @@ class OutputtingCommandDrivenChatObserver(CommandDrivenChatObserver, metaclass=A
 
     def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory,
                  actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
-                 actionOnNonCommandInput: NON_COMMAND_MSG_HANDLER = None,
                  acceptNonCommandInputWithPrefix: bool = False):
         super().__init__(actionOnCommandError if (actionOnCommandError is not None) else self.__defaultErrorHandler,
-                         actionOnNonCommandInput,
                          acceptNonCommandInputWithPrefix)
         self.csqs = csqs
         self.ocmf = ocmf

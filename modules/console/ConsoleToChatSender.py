@@ -15,7 +15,7 @@ class ConsoleToChatSender(CommandProvider):
         self.csqs = csqs
         self.ocmf = ocmf
 
-    def _getConsoleCommands(self) -> list[Command]:
+    def getConsoleCommands(self) -> list[Command]:
         optionalArgs = [
             CommandArg("body"),
         ]

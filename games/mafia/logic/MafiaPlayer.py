@@ -1,15 +1,9 @@
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from games.mafia.logic.MafiaRole import MafiaRole
-
-
 class MafiaPlayer:
     nick: str
-    role: MafiaRole
+    role: 'MafiaRole'
     alive: bool
 
-    def __init__(self, nick: str, role: MafiaRole):
+    def __init__(self, nick: str, role: 'MafiaRole'):
         self.nick = nick
         self.role = role
         self.alive = True

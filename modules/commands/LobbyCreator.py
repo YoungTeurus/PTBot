@@ -5,7 +5,7 @@ from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from games.lobby.Lobby import Lobby, PlayerLobbySettings
 from modules.base.Command import Command, CommandArg, ARGS_DICT, CHAT_MESSAGE_KEY
-from modules.base.CommandDrivenChatObserver import ACTION_ON_COMMAND_ERROR_HANDLER, NON_COMMAND_MSG_HANDLER
+from modules.base.CommandDrivenChatObserver import ACTION_ON_COMMAND_ERROR_HANDLER
 from modules.base.CommandProvider import CommandProvider
 from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenChatObserver
 from utils.BotProperites import BotProperties
@@ -22,13 +22,12 @@ class LobbyCreator(OutputtingCommandDrivenChatObserver, CommandProvider):
 
     def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory, bp: BotProperties,
                  actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
-                 actionOnNonCommandInput: NON_COMMAND_MSG_HANDLER = None,
                  acceptNonCommandInputWithPrefix: bool = False):
-        super().__init__(csqs, ocmf, actionOnCommandError, actionOnNonCommandInput, acceptNonCommandInputWithPrefix)
+        super().__init__(csqs, ocmf, actionOnCommandError, acceptNonCommandInputWithPrefix)
         self.bp = bp
         self.lobby = None
 
-    def _getConsoleCommands(self) -> list[Command]:
+    def getConsoleCommands(self) -> list[Command]:
         pass
 
     def _getInitialCommands(self) -> list[Command]:

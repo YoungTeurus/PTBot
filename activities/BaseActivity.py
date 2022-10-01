@@ -7,6 +7,7 @@ from utils.Utils import CALLBACK_FUNCTION
 class BaseActivity:
     lock: Lock
     running: bool
+    # Метод, после вызова которого активити перестаёт обновляться (удаляется из контейнера активити)
     selfRemove: CALLBACK_FUNCTION
 
     def __init__(self):
@@ -36,4 +37,4 @@ class BaseActivity:
         """
         Выполняется при каждом обновлении контейнера.
         """
-        pass
+        raise NotImplementedError

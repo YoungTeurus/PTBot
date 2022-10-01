@@ -40,7 +40,7 @@ CHAT_READER_WORKER = {
 
 
 class ACTIVITY_WORKER:
-    secsBetweenUpdates: float = 5
+    secsBetweenUpdates: float = 0.5
 
 
 # Определяет символ(-ы), необходимые для установки перед сообщением, чтобы бот распознал в них команду.

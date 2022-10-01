@@ -19,7 +19,7 @@ class AddAdminCommandModule(OutputtingCommandDrivenChatObserver, CommandProvider
     def _getInitialCommands(self) -> list[Command]:
         return [Command("op", self.chatAddOp, optionalArgs=[CommandArg("nick")])]
 
-    def _getConsoleCommands(self) -> list[Command]:
+    def getConsoleCommands(self) -> list[Command]:
         return [Command("op", self.consoleAddOp, [CommandArg("nick")])]
 
     def chatAddOp(self, args: ARGS_DICT) -> None:

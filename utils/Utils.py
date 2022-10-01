@@ -44,3 +44,10 @@ def groupBy(objs: list[T], keyGetter: Callable[[T], K]) -> dict[K, list[T]]:
         key: K = keyGetter(obj)
         dictUpdate(grouped, key, lambda k, v: v.append(obj) if v is not None else [obj])
     return grouped
+
+
+class MutableInt:
+    value: int
+
+    def __init__(self, value: int):
+        self.value = value

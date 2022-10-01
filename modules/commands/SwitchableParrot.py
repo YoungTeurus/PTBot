@@ -5,7 +5,6 @@ from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
 from modules.base.Command import CommandArg, ARGS_DICT, CHAT_MESSAGE_KEY
 from modules.base.CommandDrivenChatObserver import Command
 from modules.base.OutputtingCommandDrivenModule import OutputtingCommandDrivenChatObserver
-from utils.ConsoleProvider import CONSOLE
 from utils.Utils import CALLBACK_FUNCTION
 
 
@@ -16,7 +15,7 @@ class SwitchableParrot(OutputtingCommandDrivenChatObserver):
     argsToCallback: dict[str, CALLBACK_FUNCTION]
 
     def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory):
-        super().__init__(csqs, ocmf, actionOnNonCommandInput=self.doParrot)
+        super().__init__(csqs, ocmf)
         self.enabled = False
         self.onlyAnonimous = False
 
@@ -74,7 +73,7 @@ class SwitchableParrot(OutputtingCommandDrivenChatObserver):
         else:
             self.globalMessage('Режим анонимки деактивирован!')
 
-    def doParrot(self, msg: ChatMessage) -> NotifyAction:
+    def onNonCommandInput(self, msg: ChatMessage, hasPrefix: bool) -> NotifyAction:
         if self.enabled:
             if msg.type.isWhisper:
                 self.globalMessage('Кто-то прошептал(а): "{}"'.format(msg.body))

@@ -19,7 +19,7 @@ class ConsoleToBotSender(CommandProvider):
         self.icmp = icmp
         self.cprovide = cprovide
 
-    def _getConsoleCommands(self) -> list[Command]:
+    def getConsoleCommands(self) -> list[Command]:
 
         optionalArgs = [
             CommandArg("sender"),

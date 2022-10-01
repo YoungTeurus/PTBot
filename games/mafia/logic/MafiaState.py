@@ -1,23 +1,23 @@
 from __future__ import annotations
-from collections import Callable
 
 from games.mafia.logic.MafiaPlayer import MafiaPlayer
 
 
 class MafiaState:
     players: list[MafiaPlayer]
-    actionQueue: list[Callable[[MafiaState], None]]
     ended: bool
-
     night: bool
-    nightNumber: int
+    dayNumber: int
 
     def __init__(self, players: list[MafiaPlayer]) -> None:
         self.ended = False
         self.players = players
-        self.actionQueue = []
         self.night = True
-        self.nightNumber = 0
+        self.dayNumber = 0
 
+    def nextDay(self):
+        self.night = False
+        self.dayNumber += 1
 
-MAFIA_STATE_CALLBACK = Callable[[MafiaState], None]
+    def nextNight(self):
+        self.night = True

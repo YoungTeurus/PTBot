@@ -18,6 +18,7 @@ class ChatProvider:
 
     def removeObserver(self, observer: ChatObserver) -> None:
         self.observers.remove(observer)
+        observer.endObserving()
 
     def cleanAndAddMultipleMessages(self, msgs: list[ChatMessage]) -> None:
         if len(self.history) + len(msgs) > MAX_HISTORY_SIZE:

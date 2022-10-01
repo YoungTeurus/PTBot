@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable
 
 from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
@@ -10,8 +10,6 @@ from utils.ConsoleProvider import CONSOLE
 
 # (name, msg.sender, args, reason) => None
 ACTION_ON_COMMAND_ERROR_HANDLER = Callable[[str, str, list[str], str], None]
-# (msg) => action
-NON_COMMAND_MSG_HANDLER = Callable[[ChatMessage], NotifyAction]
 
 
 class CommandDrivenChatObserver(SelfAwareChatObserver):
@@ -23,19 +21,19 @@ class CommandDrivenChatObserver(SelfAwareChatObserver):
     commands: dict[str, Command]
     # (name, msg.sender, args, reason) => None
     actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER
-    actionOnNonCommandInput: Optional[NON_COMMAND_MSG_HANDLER]
     acceptNonCommandInputWithPrefix: bool
 
     def __init__(self, actionOnCommandError: ACTION_ON_COMMAND_ERROR_HANDLER = None,
-                 actionOnNonCommandInput: NON_COMMAND_MSG_HANDLER = None,
                  acceptNonCommandInputWithPrefix: bool = False):
         self.commands = {}
         self.actionOnCommandError = actionOnCommandError
-        self.actionOnNonCommandInput = actionOnNonCommandInput
         self.acceptNonCommandInputWithPrefix = acceptNonCommandInputWithPrefix
 
         for command in self._getInitialCommands():
             self.addCommand(command)
+
+    def onNonCommandInput(self, msg: ChatMessage, hasPrefix: bool) -> NotifyAction:
+        return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
 
     def _getInitialCommands(self) -> list[Command]:
         raise NotImplementedError
@@ -62,9 +60,7 @@ class CommandDrivenChatObserver(SelfAwareChatObserver):
 
     def doOnOtherMessage(self, msg: ChatMessage) -> NotifyAction:
         if not msg.body.startswith(COMMAND_PREFIX):
-            if self.actionOnNonCommandInput is not None:
-                return self.actionOnNonCommandInput(msg)
-            return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
+            return self.onNonCommandInput(msg, False)
         bodyWithoutPrefix = msg.body[len(COMMAND_PREFIX):]
         command, args = CommandParser.getCommandAndArgs(bodyWithoutPrefix)
 
@@ -88,8 +84,8 @@ class CommandDrivenChatObserver(SelfAwareChatObserver):
                 self.onError(command, msg.sender, args, "There was at least one problem with args validation: {}"
                              .format(validateErrors))
 
-        elif self.acceptNonCommandInputWithPrefix and self.actionOnNonCommandInput is not None:
-            self.actionOnNonCommandInput(msg)
+        elif self.acceptNonCommandInputWithPrefix:
+            return self.onNonCommandInput(msg, True)
         return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
 
     @staticmethod

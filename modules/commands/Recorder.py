@@ -17,7 +17,6 @@ class Recorder(OutputtingCommandDrivenChatObserver):
 
     def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory):
         super().__init__(csqs, ocmf,
-                         actionOnNonCommandInput=self.saveMessage,
                          acceptNonCommandInputWithPrefix=True)
         self.history = {}
 
@@ -55,7 +54,7 @@ class Recorder(OutputtingCommandDrivenChatObserver):
                 self.globalMessage(savedMsg)
         self.history.pop(msgSender)
 
-    def saveMessage(self, msg: ChatMessage) -> NotifyAction:
+    def onNonCommandInput(self, msg: ChatMessage, hasPrefix: bool) -> NotifyAction:
         if msg.type.isSentByBot:
             return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
         msgSender = msg.sender

@@ -17,3 +17,9 @@ class ChatObserver:
 
     def notify(self, msg: ChatMessage) -> NotifyAction:
         pass
+
+    def endObserving(self) -> None:
+        """
+        Выполняется после удаления наблюдателя из контейнера наблюдателей
+        """
+        pass
