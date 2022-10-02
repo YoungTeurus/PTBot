@@ -21,3 +21,9 @@ class MafiaState:
 
     def nextNight(self):
         self.night = True
+
+    def getAllAlive(self) -> list[MafiaPlayer]:
+        return [player for player in self.players if player.alive]
+
+    def getAllAliveNicknames(self) -> list[str]:
+        return [player.nick for player in self.players if player.alive]

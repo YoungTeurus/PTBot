@@ -8,7 +8,7 @@ from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from games.mafia.MafiaActionTranformer import ACTION_TYPE_TO_WORKER_ACTION, ACTION_TYPE_TO_LOCKED_UPDATE_ACTION
+from games.mafia.MafiaActionTranformer import ACTION_TYPE_TO_WORKER_ACTION
 from games.mafia.WaitMessageSettings import WaitMessageSettings
 from games.mafia.logic.MafiaAction import MafiaAction
 from games.mafia.logic.MafiaGame import MafiaGame
@@ -48,11 +48,16 @@ class MafiaWorker(OutputtingCommandDrivenChatObserver, BaseActivity):
             immediateAction: MafiaAction = self.game.immediateActionQueue.pop(0)
             ACTION_TYPE_TO_WORKER_ACTION[immediateAction.__class__](immediateAction, self)
 
-        if (lockingAction := self.game.currentLockingAction) is not None:
-            ACTION_TYPE_TO_LOCKED_UPDATE_ACTION[lockingAction.__class__](lockingAction, self)
-        elif len(self.game.actionQueue) > 0:
-            action: MafiaAction = self.game.actionQueue.pop(0)
-            ACTION_TYPE_TO_WORKER_ACTION[action.__class__](action, self)
+        if self.game.currentAction.finished():
+            self.game.currentAction = self.game.actions.pop(0) if len(self.game.actions) > 0 else None
+        if self.game.currentAction is not None:
+            self.game.currentAction.act(self)
+
+        # if (lockingAction := self.game.currentLockingAction) is not None:
+        #     ACTION_TYPE_TO_LOCKED_UPDATE_ACTION[lockingAction.__class__](lockingAction, self)
+        # elif len(self.game.actionQueue) > 0:
+        #     action: MafiaAction = self.game.actionQueue.pop(0)
+        #     ACTION_TYPE_TO_WORKER_ACTION[action.__class__](action, self)
 
     def _getInitialCommands(self) -> list[Command]:
         return []
@@ -62,7 +67,7 @@ class MafiaWorker(OutputtingCommandDrivenChatObserver, BaseActivity):
         for playerName in self.waitingForAnswers:
             waitTuple = self.waitingForAnswers[playerName]
             if curTime > waitTuple.startWaitTime + waitTuple.timeoutSecs:
-                waitTuple.onTimeout()
+                waitTuple.onTimeout(playerName)
 
     def endObserving(self) -> None:
         self.selfRemove()

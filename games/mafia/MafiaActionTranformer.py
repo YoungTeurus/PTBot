@@ -10,7 +10,7 @@ from games.mafia.WaitMessageSettings import WaitMessageSettings, WAIT_MESSAGE_PR
 if TYPE_CHECKING:
     from games.mafia.MafiaWorker import MafiaWorker
 from games.mafia.logic.MafiaAction import MafiaAction, WaitBeforeNextAction, SendGlobalMessage, SendWhisperMessage, \
-    WaitForAnswer, WaitForAnswerFromMany, StartNewNight, LockingMafiaAction
+    WaitForAnswer, WaitForAnswerFromMany, StartNewNight, LockingMafiaAction, StartNewDay
 from utils.Utils import MutableInt, CALLBACK_FUNCTION
 
 if TYPE_CHECKING:
@@ -75,14 +75,14 @@ def waitForAnswerFromMany(action: MafiaAction, mafiaWorker: MafiaWorker):
                 answers[player] = msg
                 with lock:
                     answersNeeded.value -= 1
-                if _action.onEachAnswerAfterValidation is not None:
-                    return _action.onEachAnswerAfterValidation(msg)
                 return True
 
             return wrapper
 
         def getAddNotAnsweredCallback(player: str) -> CALLBACK_FUNCTION:
             def wrapper() -> None:
+                if _action.onEachAnswerTimeout is not None:
+                    _action.onEachAnswerTimeout(player)
                 answers[player] = None
                 with lock:
                     answersNeeded.value -= 1
@@ -116,6 +116,13 @@ def startNewNight(action: MafiaAction, mafiaWorker: MafiaWorker):
         mafiaWorker.game.nextNight()
 
 
+def startNewDay(action: MafiaAction, mafiaWorker: MafiaWorker):
+    if isinstance(action, StartNewDay):
+        _action: StartNewDay = action
+
+        mafiaWorker.game.nextDay()
+
+
 ACTION_TYPE_TO_WORKER_ACTION: dict[Type[MafiaAction], MAFIA_ACTION_CALLBACK] = {
     WaitBeforeNextAction: waitBeforeNextAction,
     SendGlobalMessage: sendGlobalMessage,
@@ -123,6 +130,7 @@ ACTION_TYPE_TO_WORKER_ACTION: dict[Type[MafiaAction], MAFIA_ACTION_CALLBACK] = {
     WaitForAnswer: waitForAnswer,
     WaitForAnswerFromMany: waitForAnswerFromMany,
     StartNewNight: startNewNight,
+    StartNewDay: startNewDay
 }
 
 
@@ -136,11 +144,16 @@ def waitBeforeNextActionLockUpdate(action: MafiaAction, mafiaWorker: MafiaWorker
                 _action.onTimeoutEnd()
 
 
+def waitForAnswerLockUpdate(action: MafiaAction, mafiaWorker: MafiaWorker) -> None:
+    pass
+
+
 def waitForAnswerFromManyLockUpdate(action: MafiaAction, mafiaWorker: MafiaWorker) -> None:
     pass
 
 
 ACTION_TYPE_TO_LOCKED_UPDATE_ACTION: dict[Type[LockingMafiaAction], MAFIA_LOCKING_ACTION_CALLBACK] = {
     WaitBeforeNextAction: waitBeforeNextActionLockUpdate,
-    WaitForAnswerFromMany:  waitForAnswerFromManyLockUpdate,
+    WaitForAnswer: waitForAnswerLockUpdate,
+    WaitForAnswerFromMany: waitForAnswerFromManyLockUpdate,
 }
