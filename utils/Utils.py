@@ -46,6 +46,30 @@ def groupBy(objs: list[T], keyGetter: Callable[[T], K]) -> dict[K, list[T]]:
     return grouped
 
 
+COUNT_DICT = dict[T, int]
+
+
+def dictMostCommon(d: dict[T, int]) -> list[T]:
+    mostCommon: list[T] = []
+    mostCommonCount: int = -1
+    for key in d:
+        if (v := d[key]) < 0:
+            raise ValueError("Count dict can't contain less than zero values")
+        elif v > mostCommonCount:
+            mostCommon = [key]
+            mostCommonCount = v
+        elif v == mostCommonCount:
+            mostCommon.append(key)
+    return mostCommon
+
+
+if __name__ == "__main__":
+    print(dictMostCommon({'a': 1, 'b': 2, 'c': 3}))
+    print(dictMostCommon({'a': 1, 'b': 3, 'c': 3}))
+    print(dictMostCommon({'a': 3, 'b': 2, 'c': 3}))
+    print(dictMostCommon({}))
+
+
 class MutableInt:
     value: int
 

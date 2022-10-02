@@ -1,14 +1,14 @@
-# from games.mafia.logic.Utils import MAFIA_ROLE_ACTION
-
-
 class MafiaTeam:
     name: str
-    # onTeamMemberDead: MAFIA_ROLE_ACTION
 
 
 class MafiaRole:
     name: str
     team: MafiaTeam
+
+    def __str__(self):
+        return "<MafiaRole - {}>".format(self.name)
+
 
     # onGameStart: MAFIA_ROLE_ACTION
     #

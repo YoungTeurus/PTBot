@@ -10,13 +10,20 @@ from games.mafia.WaitMessageSettings import WaitMessageSettings, WAIT_MESSAGE_PR
 if TYPE_CHECKING:
     from games.mafia.MafiaWorker import MafiaWorker
 from games.mafia.logic.MafiaAction import MafiaAction, WaitBeforeNextAction, SendGlobalMessage, SendWhisperMessage, \
-    WaitForAnswer, WaitForAnswerFromMany
+    WaitForAnswer, WaitForAnswerFromMany, StartNewNight, LockingMafiaAction
 from utils.Utils import MutableInt, CALLBACK_FUNCTION
+
+if TYPE_CHECKING:
+    MAFIA_ACTION_CALLBACK = Callable[[MafiaAction, MafiaWorker], None]
+    MAFIA_LOCKING_ACTION_CALLBACK = Callable[[LockingMafiaAction, MafiaWorker], None]
 
 
 def waitBeforeNextAction(action: MafiaAction, mafiaWorker: MafiaWorker):
     if isinstance(action, WaitBeforeNextAction):
-        mafiaWorker.waitBeforeNextActionSecs = action.timeoutSecs
+        _action: WaitBeforeNextAction = action
+
+        _action.startWait()
+        mafiaWorker.game.currentLockingAction = _action
 
 
 def sendGlobalMessage(action: MafiaAction, mafiaWorker: MafiaWorker):
@@ -31,24 +38,45 @@ def sendWhisperMessage(action: MafiaAction, mafiaWorker: MafiaWorker):
 
 def waitForAnswer(action: MafiaAction, mafiaWorker: MafiaWorker):
     if isinstance(action, WaitForAnswer):
-        wms = WaitMessageSettings(action.timeoutSecs, action.onAnswerReceived,
-                                  action.onAnswerNotReceived)
-        mafiaWorker.waitForAnswer(action.desiredSender, wms)
+        def onAnswerReceivedAndUnlockNextAction(msg: ChatMessage) -> bool:
+            endWait = _action.onAnswerReceived(msg)
+            if endWait:
+                mafiaWorker.game.currentLockingAction = None
+            return endWait
+
+        def onAnswerNotReceivedAndUnlockNextAction() -> None:
+            _action.onAnswerNotReceived()
+            mafiaWorker.game.currentLockingAction = None
+
+        _action: WaitForAnswer = action
+
+        mafiaWorker.game.currentLockingAction = _action
+        wms = WaitMessageSettings(_action.timeoutSecs, onAnswerReceivedAndUnlockNextAction,
+                                  onAnswerNotReceivedAndUnlockNextAction)
+        mafiaWorker.waitForAnswer(_action.desiredSender, wms)
 
 
 def waitForAnswerFromMany(action: MafiaAction, mafiaWorker: MafiaWorker):
     if isinstance(action, WaitForAnswerFromMany):
+        _action: WaitForAnswerFromMany = action
+
+        mafiaWorker.game.currentLockingAction = _action
+
         answers: dict[str, Optional[ChatMessage]] = {}
 
         lock = Lock()
         # Количество ответов, которое мы ожидаем:
-        answersNeeded: MutableInt = MutableInt(len(action.desiredSenders))
+        answersNeeded: MutableInt = MutableInt(len(_action.desiredSenders))
 
         def getAddAnswerConsumer(player: str) -> WAIT_MESSAGE_PROCESSOR:
             def wrapper(msg: ChatMessage) -> bool:
+                if _action.onAnswerValidator is not None and not _action.onAnswerValidator(msg):
+                    return False  # Если ответ не прошёл валидацию, продолжаем ждать ответа
                 answers[player] = msg
                 with lock:
                     answersNeeded.value -= 1
+                if _action.onEachAnswerAfterValidation is not None:
+                    return _action.onEachAnswerAfterValidation(msg)
                 return True
 
             return wrapper
@@ -61,8 +89,8 @@ def waitForAnswerFromMany(action: MafiaAction, mafiaWorker: MafiaWorker):
 
             return wrapper
 
-        for desiredSender in action.desiredSenders:
-            wms = WaitMessageSettings(action.timeoutSecs, getAddAnswerConsumer(desiredSender),
+        for desiredSender in _action.desiredSenders:
+            wms = WaitMessageSettings(_action.timeoutSecs, getAddAnswerConsumer(desiredSender),
                                       getAddNotAnsweredCallback(desiredSender))
             mafiaWorker.waitForAnswer(desiredSender, wms)
 
@@ -72,16 +100,47 @@ def waitForAnswerFromMany(action: MafiaAction, mafiaWorker: MafiaWorker):
                 with lock:
                     if answersNeeded.value > 0:
                         continue
-                return action.onAnswers(answers)
+
+                # Когда получили все ответы:
+                mafiaWorker.game.currentLockingAction = None
+                return _action.onAnswers(answers)
 
         thread = Thread(target=waitForAllAnswers, daemon=True)
         thread.start()
 
 
-ACTION_TYPE_TO_WORKER_ACTION: dict[Type[MafiaAction], Callable[[MafiaAction, MafiaWorker], None]] = {
+def startNewNight(action: MafiaAction, mafiaWorker: MafiaWorker):
+    if isinstance(action, StartNewNight):
+        _action: StartNewNight = action
+
+        mafiaWorker.game.nextNight()
+
+
+ACTION_TYPE_TO_WORKER_ACTION: dict[Type[MafiaAction], MAFIA_ACTION_CALLBACK] = {
     WaitBeforeNextAction: waitBeforeNextAction,
     SendGlobalMessage: sendGlobalMessage,
     SendWhisperMessage: sendWhisperMessage,
     WaitForAnswer: waitForAnswer,
     WaitForAnswerFromMany: waitForAnswerFromMany,
+    StartNewNight: startNewNight,
+}
+
+
+def waitBeforeNextActionLockUpdate(action: MafiaAction, mafiaWorker: MafiaWorker) -> None:
+    if isinstance(action, WaitBeforeNextAction):
+        _action: WaitBeforeNextAction = action
+
+        if _action.isWaitEnded():
+            mafiaWorker.game.currentLockingAction = None
+            if _action.onTimeoutEnd is not None:
+                _action.onTimeoutEnd()
+
+
+def waitForAnswerFromManyLockUpdate(action: MafiaAction, mafiaWorker: MafiaWorker) -> None:
+    pass
+
+
+ACTION_TYPE_TO_LOCKED_UPDATE_ACTION: dict[Type[LockingMafiaAction], MAFIA_LOCKING_ACTION_CALLBACK] = {
+    WaitBeforeNextAction: waitBeforeNextActionLockUpdate,
+    WaitForAnswerFromMany:  waitForAnswerFromManyLockUpdate,
 }

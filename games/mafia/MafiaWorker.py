@@ -8,7 +8,7 @@ from chat.ChatMessage import ChatMessage
 from chat.ChatObserver import NotifyAction
 from chat.OutgoingChatMessageFactory import OutgoingChatMessageFactory
 from chat.interfaces.ChatSenderQuerySender import ChatSenderQuerySender
-from games.mafia.MafiaActionTranformer import ACTION_TYPE_TO_WORKER_ACTION
+from games.mafia.MafiaActionTranformer import ACTION_TYPE_TO_WORKER_ACTION, ACTION_TYPE_TO_LOCKED_UPDATE_ACTION
 from games.mafia.WaitMessageSettings import WaitMessageSettings
 from games.mafia.logic.MafiaAction import MafiaAction
 from games.mafia.logic.MafiaGame import MafiaGame
@@ -21,16 +21,11 @@ class MafiaWorker(OutputtingCommandDrivenChatObserver, BaseActivity):
 
     # (player_name) => (startWaitTime, timeout, onCommand, onTimeout)
     waitingForAnswers: dict[str, WaitMessageSettings]
-    # Задержка перед следующим action:
-    waitBeforeNextActionSecs: float
-    __lastUpdateTime: float
 
     def __init__(self, csqs: ChatSenderQuerySender, ocmf: OutgoingChatMessageFactory, game: MafiaGame):
         super().__init__(csqs, ocmf, acceptNonCommandInputWithPrefix=True)
         self.game = game
         self.waitingForAnswers = {}
-        self.waitBeforeNextActionSecs = 0
-        self.__lastUpdateTime = time.time()
 
         self.game.start()
 
@@ -47,22 +42,26 @@ class MafiaWorker(OutputtingCommandDrivenChatObserver, BaseActivity):
         return NotifyAction.CONTINUE_TO_NEXT_OBSERVER
 
     def update(self) -> None:
-        curTime: float = time.time()
-        self.__checkWaitForAnswersTimeouts(curTime)
-        if self.waitBeforeNextActionSecs > 0:
-            self.waitBeforeNextActionSecs -= (curTime - self.__lastUpdateTime)
+        self.__checkWaitForAnswersTimeouts()
+
+        while len(self.game.immediateActionQueue) > 0:
+            immediateAction: MafiaAction = self.game.immediateActionQueue.pop(0)
+            ACTION_TYPE_TO_WORKER_ACTION[immediateAction.__class__](immediateAction, self)
+
+        if (lockingAction := self.game.currentLockingAction) is not None:
+            ACTION_TYPE_TO_LOCKED_UPDATE_ACTION[lockingAction.__class__](lockingAction, self)
         elif len(self.game.actionQueue) > 0:
             action: MafiaAction = self.game.actionQueue.pop(0)
             ACTION_TYPE_TO_WORKER_ACTION[action.__class__](action, self)
-        self.__lastUpdateTime = curTime
 
     def _getInitialCommands(self) -> list[Command]:
         return []
 
-    def __checkWaitForAnswersTimeouts(self, curTime: float) -> None:
+    def __checkWaitForAnswersTimeouts(self) -> None:
+        curTime: float = time.time()
         for playerName in self.waitingForAnswers:
             waitTuple = self.waitingForAnswers[playerName]
-            if waitTuple.startWaitTime + waitTuple.timeoutSecs > curTime:
+            if curTime > waitTuple.startWaitTime + waitTuple.timeoutSecs:
                 waitTuple.onTimeout()
 
     def endObserving(self) -> None:
